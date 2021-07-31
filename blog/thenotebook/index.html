@@ -93,7 +93,7 @@ Nmap done: 1 IP address (1 host up) scanned in 93.65 seconds
 <li>SQL Injection (Failed)</li>
 <li>SSTI (Failed)</li>
 </ol>
-<p>Then I opened the cookies and found JWT Token so I used <a href=https://jwt.io/#debugger-io>This website</a> to decrypt it.</p>
+<p>Then I opened the cookies and found JWT Token so I used <a href=https://jwt.io/#debugger-io>This website</a> to decoded it.</p>
 <p><img src=/images/blog/012/2.png alt=image></p>
 <p>I found a key called admin_cap set to false. Maybe if we can set it to true, we can get into admin account.
 I tried it but it kept failing until I read <a href=https://blog.pentesteracademy.com/hacking-jwt-tokens-kid-claim-misuse-key-leak-e7fce9a10a9c>This Article</a></p>
