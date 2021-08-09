@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<h2 class=blog-title>Doctor HackTheBox Walkthrough</h2>
 <p><span>February 16, 2021</span> by <span>Nasef</span></p>
+<h2 class=blog-title>Doctor HackTheBox Walkthrough</h2>
 <img class=feature-image src=https://iamnasef.com/images/blog/010/featured-image.png alt=blog-feature-image>
 <p>Doctor is a machine in which I used Server Side Template injection to get to obtain shell access and then used enumeration and exploit vulnerable service to get root Access.</p>
-<h3 id=scanning>Scanning</h3>
+<h2 id=scanning>Scanning</h2>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>nmap -sV -sV 10.10.10.209
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-29 10:35 EDT
@@ -74,7 +74,7 @@ Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 48.74 seconds
 </code></pre><p>A Normal HTTP, SSH Services and service called splunkd we will look it up later.</p>
-<h3 id=important>Important</h3>
+<h2 id=important>Important</h2>
 <p>An Important thing to do is to add the ip and domain to /etc/hosts becuase of the host routing.</p>
 <pre><code>127.0.0.1       localhost
 127.0.1.1       kali
@@ -83,7 +83,7 @@ Nmap done: 1 IP address (1 host up) scanned in 48.74 seconds
 ::1     localhost ip6-localhost ip6-loopback
 ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
-</code></pre><h3 id=testing>Testing</h3>
+</code></pre><h2 id=testing>Testing</h2>
 <p>So First I tried to browse the site using the ip there is nothing important there so I got in using doctors.htb and a login page appeared!</p>
 <p><img src=/images/blog/010/1.png alt=Username></p>
 <p>I made an account and logged in and started making new messages. I was susspious about three things as the machine name is &ldquo;Doctor&rdquo;</p>
@@ -100,7 +100,7 @@ ff02::2 ip6-allrouters
 <p>I tried to identify the template engine and it was jinja 2. So, I started listening on netcat and added the payload to title as the pervious example and executed it as I visited /archive</p>
 <pre><code>nc -lvnp 9999
 </code></pre><p><img src=/images/blog/010/5.png alt=Username></p>
-<h3 id=privilege-escalation>Privilege Escalation</h3>
+<h2 id=privilege-escalation>Privilege Escalation</h2>
 <p>I ran Linpeas and found a strange thing in password in logs section</p>
 <p><img src=/images/blog/010/6.png alt=Username></p>
 <p>So, I tried to su shaun using this as a password and it worked! At this time, I was thinking about the usage of Splunkd so I started searching for exploits and found this one

