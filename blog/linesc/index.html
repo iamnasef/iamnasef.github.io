@@ -54,15 +54,15 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>December 6, 2020</span> by <span>Nasef</span></p>
 <h2 class=blog-title>The Ultimate Linux Privilege Escalation Guide for OSCP & CTF</h2>
+<p><span>December 6, 2020</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/009/featured-image.png alt=blog-feature-image>
 <p>Privilege Escalation is a topic which most of CTF players and OSCP students struggle with. Privilege Escalation in general is to get more privilege but in this context it means getting root privilege which is the highest privilege in the system. In this article I am going to explain 7 methods of Linux privilege escalation with exploitation steps and how to fix them. But as a perquisites you must have Linux essentials for example the knowledge of how to use command line and the Linux permission model. To follow up with this tutorial we are going to use a vulnerable machine called LinESC which was created by me. You can download <a href=https://www.vulnhub.com/entry/linesc-1,616/>From Here</a>. the default user is &ldquo;muhammad&rdquo; and password is &ldquo;nasef&rdquo;.</p>
-<h2 id=1-misconfigured-permissions>1) Misconfigured Permissions</h2>
+<h3 id=misconfigured-permissions>Misconfigured Permissions</h3>
 <p>Some files are meant to be read only by root others can be read by anyone but write only by root. Sometimes files' permissions are misconfigured, for example the /etc/shadow which stores the passwords of the whole system. no one could read it except root.</p>
-<h3 id=readable-etcshadow>Readable /etc/shadow</h3>
+<h5 id=readable-etcshadow>Readable /etc/shadow</h5>
 <p>In this machine /etc/shadow is readable by everyone. so, we could easily see the root password&rsquo;s hash and crack it using john or hashcat.</p>
-<h3 id=exploitation-process>Exploitation Process</h3>
+<h5 id=exploitation-process>Exploitation Process</h5>
 <ol>
 <li>To check the permissions of /etc/shadow use</li>
 </ol>
@@ -74,11 +74,11 @@ Contact Me
 </code></pre><p><img src=/images/blog/009/6.png alt=Username>
 3. store the hash in a file and run john over it using the rockyou wordlist.
 <img src=/images/blog/009/7.png alt=Username></p>
-<h3 id=solution>Solution</h3>
+<h5 id=solution>Solution</h5>
 <p>Set the suitable permission for the suitable file. In this case we should remove the reading permission from the other users.</p>
-<h2 id=2-sudo>2) SUDO</h2>
+<h3 id=sudo>SUDO</h3>
 <p>SUDO is a feature in Linux which allows User A to execute certain commands as User B. Sometimes the user may exectue certian commands as root. so, we may abuse this feature to gain privilege escalation.</p>
-<h3 id=exploitation-process-1>Exploitation Process</h3>
+<h5 id=exploitation-process-1>Exploitation Process</h5>
 <ol>
 <li>Use</li>
 </ol>
@@ -87,11 +87,11 @@ Contact Me
 2. As you see we can execute three commands as (root)
 3. going to /home/vuln/2 we can read the source code of the script. It just starts a new shell but because we are executing this command as root. we will get root shell.</p>
 <p><img src=/images/blog/009/8.png alt=Username></p>
-<h3 id=solution-1>Solution</h3>
+<h5 id=solution-1>Solution</h5>
 <p>Set the suitable permission for the suitable file. In this case remove the whole entry from /etc/sudoers.</p>
-<h2 id=3-suid>3) SUID</h2>
+<h3 id=suid>SUID</h3>
 <p>SUID is a special permission which allows any user to execute file as the owner of the file. So, if the owner of the file is root then any user may execute this file as root.</p>
-<h3 id=exploitation-process-2>Exploitation Process</h3>
+<h5 id=exploitation-process-2>Exploitation Process</h5>
 <ol>
 <li>Use</li>
 </ol>
@@ -105,11 +105,11 @@ Contact Me
 </code></pre><p>we found the source code which basically do the same thing as sudo file.
 4. Because SUID is set and the owner is root we were able to get the shell as root.</p>
 <p><img src=/images/blog/009/9.png alt=Username></p>
-<h3 id=solution-2>Solution</h3>
+<h5 id=solution-2>Solution</h5>
 <p>Set the suitable permission for the suitable file. In this case remove the suid permission from the file.</p>
-<h2 id=4-cronjobs>4) CRONJOBS</h2>
+<h3 id=cronjobs>CRONJOBS</h3>
 <p>Cronjobs are scheduled commands & scripts which automatically run at certain interval of time as a specific user. If a certain script is executed at certain interval of time as root, and we are able to modify this script. we may get root shell.</p>
-<h3 id=exploitation-process-3>Exploitation Process</h3>
+<h5 id=exploitation-process-3>Exploitation Process</h5>
 <ol>
 <li>Use</li>
 </ol>
@@ -130,14 +130,14 @@ Contact Me
 <img src=/images/blog/009/13.png alt=Username></p>
 </li>
 </ol>
-<h3 id=solution-3>Solution</h3>
+<h5 id=solution-3>Solution</h5>
 <p>Check the scheduled tasks for the root and remove the unnecessary ones or the ones that may be exploited. In our case remove the script.sh task.</p>
-<h2 id=5-misconfigured-services>5) Misconfigured Services</h2>
+<h3 id=misconfigured-services>Misconfigured Services</h3>
 <p>Some services may be misconfigured which leads to privilege escalation.</p>
-<h3 id=nfs-no-root-squashing>NFS no-root-squashing</h3>
+<h5 id=nfs-no-root-squashing>NFS no-root-squashing</h5>
 <p>A famous misconfiguration is the NFS no-root-squashing. NFS is a protocol which allows the server to share specified directories with other computers.</p>
 <p>If computerA has two users (muhammad,root). Muhammad created a file in the share then the owner will be muhammad of computerA but the problem arises when root from computerA creates a file in the share. the NFS will confuse the root of computerA with the root of the share. So if the root in computerA created a script and added suid permission for file in the server share. then a simple user in the server may run this script as the root of the share. which is very dangerous.</p>
-<h3 id=exploitation-process-4>Exploitation Process</h3>
+<h4 id=exploitation-process-4>Exploitation Process</h4>
 <ol>
 <li>Run</li>
 </ol>
@@ -156,21 +156,21 @@ Contact Me
 7. From the vulnerable system run the script and voila the new root user is added!
 8. su to the newly created user.</p>
 <p><img src=/images/blog/009/17.png alt=Username></p>
-<h3 id=solution-4>Solution</h3>
+<h5 id=solution-4>Solution</h5>
 <p>To solve misconfigured services, we must reconfigure the service. In our case remove the no-root-squashing.</p>
-<h2 id=6-passwords>6) Passwords</h2>
+<h3 id=passwords>Passwords</h3>
 <p>There are some cases where root&rsquo;s password due to bad practices is available in plain sight and we will talk only about two cases because there are unlimited number of password management issues. This method of privilege escalation is hard to find because there is no direct way to find stored passwords. but it&rsquo;s useful to check the config files of the running services, because there might be password reuse. also check the system directories and try to check if there is a suspicious file.</p>
-<h3 id=history>History</h3>
+<h5 id=history>History</h5>
 <p>if you typed the command history it will give you the history of commands done by the user.</p>
 <p><img src=/images/blog/009/1.png alt=Username></p>
 <p>Inspecting the output, you will find two important lines. The first is telling you to follow my twitter account @nasefmuhammad which you should do :D . The second is a mistyped command by the user. His intention is to su root and then type the password but instead of doing that he wrote &ldquo;sudo root chicken&rdquo;, and chicken is the root&rsquo;s password.</p>
-<h3 id=ssh-keys>SSH Keys</h3>
+<h5 id=ssh-keys>SSH Keys</h5>
 <p>SSH identification keys may allow you in some cases to ssh login to the intended user without using password. So, you need to store the ssh keys in a secure place where the intended user is the only one has access.</p>
 <p><img src=/images/blog/009/2.png alt=Username></p>
 <p>In our case the root keys are stored in /home/muhammad/vuln/3/key so simply we used the ssh -i command to ssh login as root user.</p>
-<h3 id=solution-5>Solution</h3>
+<h5 id=solution-5>Solution</h5>
 <p>The solution for these kinds of problems are obvious. Just follow the best practices of storing passwords.</p>
-<h2 id=7-kernel-exploitation>7) Kernel Exploitation</h2>
+<h3 id=kernel-exploitation>Kernel Exploitation</h3>
 <p>Linux kernel like any software has a history of critical vulnerabilities. Some of these vulnerabilities may led to critical situations as privilege escalation, So we always need to check the kernel version then search for it in exploitdb or any other exploit databases.</p>
 <p>We can check for kernel version using the following command</p>
 <pre><code>uname -r
@@ -178,7 +178,7 @@ Contact Me
 <p>Then searching in exploitdb for suitable exploit
 <img src=/images/blog/009/4.png alt=Username></p>
 <p>A famous reoccurring exploit in ctf is dirtycow and you could read more about it <a href=%22https://dirtycow.ninja/%22>From Here</a></p>
-<h3 id=exploitation-process-5>Exploitation Process</h3>
+<h5 id=exploitation-process-5>Exploitation Process</h5>
 <ol>
 <li>
 <p>First we are going to download the exploit <a href=%22https://gist.githubusercontent.com/KrE80r/42f8629577db95782d5e4f609f437a54/raw/71c902f55c09aa8ced351690e1e627363c231b45/c0w.c%22>From Here</a></p>
@@ -195,9 +195,9 @@ Contact Me
 </ol>
 <p><img src=/images/blog/009/5.png alt=Username></p>
 <p>After the exploitation you will found that a new user with root privileges is created and you are now root!</p>
-<h3 id=solution-6>Solution</h3>
+<h5 id=solution-6>Solution</h5>
 <p>The solution for kernel exploits is to keep your system updated. In our case we must ditch the 8.04 ubuntu and get a supported version.</p>
-<h2 id=summary>Summary</h2>
+<h3 id=summary>Summary</h3>
 <p>These are the most common 7 ways of getting privilege escalation in Linux system. If you have any question you can email me at <a href=mailto:me@muhammadnasef.com>me@muhammadnasef.com</a> and follow me at @nasefmuhammad in twitter. Thanks for your time!</p>
 </article>
 </div>

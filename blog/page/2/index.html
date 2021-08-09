@@ -1,7 +1,7 @@
 <!doctype html><html lang=en-us><head>
 <script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
 <meta charset=utf-8>
-<title>Nasef | Application Security Engineer and Instructor</title>
+<title>Nasef's Blog</title>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
@@ -49,115 +49,73 @@ Contact Me
 </div>
 </nav>
 <main>
-<section class=site-hero style=background-image:url(images/backgrounds/hero-background.jpg)>
+<section class=site-blog-header>
+<div class=container>
+<div class="row justify-content-center">
+<div class="col-lg-8 text-center">
+<h1>Nasef's Blog</h1>
+<p>
+CTFs Walkthroughs, Security Writeups, Crash Courses, and more.
+</p>
+</div>
+</div>
+</div>
+</section>
+<section class=site-blog>
 <div class=container>
 <div class=row>
-<div class="col-lg-10 mx-auto">
-<div class="site-hero-content text-center">
-<h1>
-KEEPING YOU SAFE
-</h1>
-<ul class=site-hero-content-buttons>
-<li>
-<a href=https://iamnasef.com/blog class="btn btn-secondary">
-<span class=btn-area>
-<span data-text="My Articles">
-My Articles
-</span>
-</span>
-</a>
+<div class=col-lg-6>
+<article class=site-blog-post>
+<div class=site-blog-post-thumb>
+<img src=https://iamnasef.com/images/blog/008/regular-image.png alt=post-thumb>
+</div>
+<div class=site-blog-post-content>
+<span>September 25, 2020</span>
+<h3><a href=https://iamnasef.com/blog/tabby/>Tabby HackTheBox Walkthrough</a></h3>
+<p>
+Tabby is a machine in which I used Local File Inclusion to get tomcat credintials to obtain shell access and then used enumeration and lxd to get root Access. ...
+</p>
+<a href=https://iamnasef.com/blog/tabby/ class=read-more>read more</a>
+</div>
+</article>
+</div>
+<div class=col-lg-6>
+<article class=site-blog-post>
+<div class=site-blog-post-thumb>
+<img src=https://iamnasef.com/images/blog/regular-image-vulnhub.png alt=post-thumb>
+</div>
+<div class=site-blog-post-content>
+<span>September 24, 2020</span>
+<h3><a href=https://iamnasef.com/blog/ted/>Ted:1 Vulnhub Walkthrough</a></h3>
+<p>
+Ted:1 is a machine in which I used Local File Inclusion Vulnerability to obtain shell access and then exploited the misconfigured sudo permissions to get root Access. ...
+</p>
+<a href=https://iamnasef.com/blog/ted/ class=read-more>read more</a>
+</div>
+</article>
+</div>
+<div class=col-12>
+<div class=site-blog-pagination>
+<ul class="pagination pagination-default">
+<li class=page-item>
+<a href=/blog/ aria-label=First class=page-link role=button><span aria-hidden=true>&#171;&#171;</span></a>
 </li>
-<li>
-<a href=https://iamnasef.com/contact class="btn btn-primary">
-<span class=btn-area>
-<span data-text="Contact Me">
-Contact Me
-</span>
-</span>
-</a>
+<li class=page-item>
+<a href=/blog/ aria-label=Previous class=page-link role=button><span aria-hidden=true>&#171;</span></a>
+</li>
+<li class=page-item>
+<a href=/blog/ aria-label="Page 1" class=page-link role=button>1</a>
+</li>
+<li class="page-item active">
+<a href=# aria-current=page aria-label="Page 2" class=page-link role=button>2</a>
+</li>
+<li class="page-item disabled">
+<a href=# aria-disabled=true aria-label=Next class=page-link role=button tabindex=-1><span aria-hidden=true>&#187;</span></a>
+</li>
+<li class="page-item disabled">
+<a href=# aria-disabled=true aria-label=Last class=page-link role=button tabindex=-1><span aria-hidden=true>&#187;&#187;</span></a>
 </li>
 </ul>
-</div>
-</div>
-</div>
-</div>
-<a href=#whoami class="site-hero-scroll scroll-to">
-<img src=images/arrow-down.svg alt=arrow-down>
-</a>
-</section>
-<section class=site-whoami id=whoami>
-<div class=container>
-<div class=row>
-<div class="col-lg-6 col-md-10 mx-auto">
-<div class=section-title>
-<h1>I AM NASEF</h1>
-<p>Since my laptop got hacked, I've backpacked for a cyber security journey where I tirelessly in pursuit of keeping people safe. Combining my technical skills in application security engineering, my soft skills in communicating with clients and employers, giving technical security workshops, giving cyber security awareness workshops, and continuously wanting to spread my knowledge in the cyber security space, my goal became crystal clear:</p>
-<h2> KEEPING YOU SAFE</h2>
-</div>
-</div>
-<div class="col-lg-6 col-md-10 mx-auto" id=whoami-img>
-</div>
-</div>
-</div>
-</section>
-<section class=site-appsec id=appsec>
-<div class=container>
-<div class=row>
-<div class="col-lg-6 col-md-10 mx-auto" id=appsec-img>
-</div>
-<div class="col-lg-6 col-md-10 mx-auto">
-<div class=appsec-title>
-<h1>APPLICATION SECURITY ENGINEER</h1>
-<p>I wanted to combine my love for building with keeping people safe so I chose Application Security Engineering. Working with developers to achieve this goal while securing the software development life cycle (SDLC), by conducting various types of testing as static application security testing (SAST) and dynamic application security testing (DAST) using security tools as Burpsuite.</p>
-<a href=https://iamnasef.com/contact class="btn btn-secondary appsec-button">
-<span class=btn-area>
-<span data-text="Need Help ?">
-Need Help ?
-</span>
-</span>
-</a>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section class=site-instructor id=instructor>
-<div class=container>
-<div class=row>
-<div class="col-lg-6 col-md-10 mx-auto">
-<div class=instructor-title>
-<h1>CYBER SECURITY INSTRUCTOR</h1>
-<p>Giving workshops, writing articles on my blog, making videos on my YouTube channel, and creating online courses. This is my other way of keeping you safe by teaching technical stuff to your IT, development, and security departments; to teaching cyber security awareness to your Non-IT employees.</p>
-<a href=https://iamnasef.com/blog class="btn btn-secondary blog-btn">
-<span class=btn-area>
-<span data-text="My Blog">
-My Blog
-</span>
-</span>
-</a>
-<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ class="btn btn-secondary">
-<span class=btn-area>
-<span data-text="YouTube Channel">
-YouTube Channel
-</span>
-</span>
-</a>
-</div>
-</div>
-<div class="col-lg-6 col-md-10 mx-auto" id=instructor-img>
-</div>
-</div>
-</div>
-</section>
-<section class=site-fun id=fun>
-<div class=container>
-<div class=row>
-<div class="col-lg-6 col-md-10 mx-auto" id=fun-img>
-</div>
-<div class="col-lg-6 col-md-10 mx-auto">
-<div class=fun-title>
-<h1>OUTSIDE WORK</h1>
-<p>You will find me creating and solving hacking challenges (CTFs), creating security tools for making work easier, hunting for zerodays, conducting researches, learning new stuff, and lots of discord ! </p>
 </div>
 </div>
 </div>
