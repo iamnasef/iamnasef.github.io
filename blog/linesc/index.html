@@ -5,7 +5,7 @@
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
-<meta name=generator content="Hugo 0.87.0">
+<meta name=generator content="Hugo 0.88.1">
 <link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
 <link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
 <link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
@@ -66,11 +66,11 @@ Contact Me
 <ol>
 <li>To check the permissions of /etc/shadow use</li>
 </ol>
-<pre><code>ls -la /etc/ | grep shadow
+<pre tabindex=0><code>ls -la /etc/ | grep shadow
 </code></pre><ol start=2>
 <li>If it&rsquo;s readable you could view the hash by</li>
 </ol>
-<pre><code>cat /etc/shadow
+<pre tabindex=0><code>cat /etc/shadow
 </code></pre><p><img src=/images/blog/009/6.png alt=Username>
 3. store the hash in a file and run john over it using the rockyou wordlist.
 <img src=/images/blog/009/7.png alt=Username></p>
@@ -82,7 +82,7 @@ Contact Me
 <ol>
 <li>Use</li>
 </ol>
-<pre><code>sudo -l
+<pre tabindex=0><code>sudo -l
 </code></pre><p>to list the commands allowed for the user to execute as other users
 2. As you see we can execute three commands as (root)
 3. going to /home/vuln/2 we can read the source code of the script. It just starts a new shell but because we are executing this command as root. we will get root shell.</p>
@@ -95,13 +95,13 @@ Contact Me
 <ol>
 <li>Use</li>
 </ol>
-<pre><code>find / -perm -4000 2&gt; /dev/null
+<pre tabindex=0><code>find / -perm -4000 2&gt; /dev/null
 </code></pre><p>to list all files with SUID permissions in the system.
 2. We found that an executable with the name</p>
-<pre><code>/home/muhammad/vuln/1/suid
+<pre tabindex=0><code>/home/muhammad/vuln/1/suid
 </code></pre><p>is running.
 3. going to</p>
-<pre><code>/home/muhammad/vuln/1/
+<pre tabindex=0><code>/home/muhammad/vuln/1/
 </code></pre><p>we found the source code which basically do the same thing as sudo file.
 4. Because SUID is set and the owner is root we were able to get the shell as root.</p>
 <p><img src=/images/blog/009/9.png alt=Username></p>
@@ -113,7 +113,7 @@ Contact Me
 <ol>
 <li>Use</li>
 </ol>
-<pre><code>cat /etc/crontab
+<pre tabindex=0><code>cat /etc/crontab
 </code></pre><p>to list all files with SUID permissions in the system.
 2. We found that a script is executed every minute as root.
 3. Checking the content of the script we found that it&rsquo;s simply copies the file passwd to replace /etc/passwd so we could simply modify /etc/passwd and add another user with root permission then logging to it.</p>
@@ -141,17 +141,17 @@ Contact Me
 <ol>
 <li>Run</li>
 </ol>
-<pre><code>cat /etc/exports
+<pre tabindex=0><code>cat /etc/exports
 </code></pre><p>see the exported shares.
 2. You will find that /home/muhammad is shared but more importantly the no-root-squashing is enabled. So, we will exploit it.
 3. In our machine mount the share using</p>
-<pre><code>mount -o rw,vers=2 192.168.190.142:/home/muhammad /mnt/exploit/
+<pre tabindex=0><code>mount -o rw,vers=2 192.168.190.142:/home/muhammad /mnt/exploit/
 </code></pre><ol start=4>
 <li>Since we are root in kali Linux, then any file we create in the share will be owned by the root of the share and giving suid permission will allow user muhammad to run this file as root. so we may create a script which copies an existing passwd but with added user -as in crontab example step 4 and 5- file to /etc/passswd. anyway the I wrote this script and it&rsquo;s in /home/muhammad/vuln/4 .</li>
 <li>Add new user in passwd as in crontab exaple step 4 and 5.</li>
 <li>Give the script SUID and execution Permessions</li>
 </ol>
-<pre><code>chmod +sx script.sh
+<pre tabindex=0><code>chmod +sx script.sh
 </code></pre><p><img src=/images/blog/009/16.png alt=Username>
 7. From the vulnerable system run the script and voila the new root user is added!
 8. su to the newly created user.</p>
@@ -173,7 +173,7 @@ Contact Me
 <h3 id=kernel-exploitation>Kernel Exploitation</h3>
 <p>Linux kernel like any software has a history of critical vulnerabilities. Some of these vulnerabilities may led to critical situations as privilege escalation, So we always need to check the kernel version then search for it in exploitdb or any other exploit databases.</p>
 <p>We can check for kernel version using the following command</p>
-<pre><code>uname -r
+<pre tabindex=0><code>uname -r
 </code></pre><p><img src=/images/blog/009/3.png alt=Username></p>
 <p>Then searching in exploitdb for suitable exploit
 <img src=/images/blog/009/4.png alt=Username></p>
