@@ -1,7 +1,7 @@
 <!doctype html><html lang=en-us><head>
 <script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
 <meta charset=utf-8>
-<title>Nasef's Blog</title>
+<title>Pit HackTheBox Walkthrough</title>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
 <meta name=author content="Nasef">
@@ -49,136 +49,90 @@ Contact Me
 </div>
 </nav>
 <main>
-<section class=site-blog-header>
+<section class="site-blog details">
 <div class=container>
 <div class="row justify-content-center">
-<div class="col-lg-8 text-center">
-<h1>Nasef's Blog</h1>
-<p>
-CTFs Walkthroughs, Security Writeups, Crash Courses, and more.
-</p>
-</div>
-</div>
-</div>
-</section>
-<section class=site-blog>
-<div class=container>
-<div class=row>
-<div class=col-lg-6>
-<article class=site-blog-post>
-<div class=site-blog-post-thumb>
-<img src=https://iamnasef.com/images/blog/regular-image-vulnhub.png alt=post-thumb>
-</div>
-<div class=site-blog-post-content>
-<span>September 26, 2020</span>
-<h3><a href=https://iamnasef.com/blog/matrix3/>Matrix:3 Vulnhub Walkthrough</a></h3>
-<p>
-Matrix:3 is a machine in which I used a combination of enumeration and reverse engineering to obtain shell access and then exploited the misconfigured sudo permissions to get root Access. ...
-</p>
-<a href=https://iamnasef.com/blog/matrix3/ class=read-more>read more</a>
-</div>
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Pit HackTheBox Walkthrough</h2>
+<p><span>September 25, 2021</span> by <span>Nasef</span></p>
+<img class=feature-image src=https://iamnasef.com/images/blog/016/featured-image.png alt=blog-feature-image>
+<p>Hello everybody!
+I am Nasef and today I am going to show you how I hacked Pit machine from hack the box, so let&rsquo;s get started!</p>
+<h3 id=services-enumeration>Services Enumeration</h3>
+<p>Nmap found ports ssh(22), http (80), and http(9090) open and also it gave me a new subdomain of pit.htb so I added it to /etc/hosts.</p>
+<p><img src=/images/blog/016/1.png alt=image></p>
+<p>I ran another nmap scan -sU for enumerating udp services and found snmp open.</p>
+<p><img src=/images/blog/016/2.png alt=image></p>
+<pre tabindex=0><code> I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.
+
+![image](/images/blog/016/3.png)
+
+This concludes the service enumeration phase.
+
+
+
+### Exploiting HTTP Service
+
+I opened pit.htb and ran gobuster but gave me nothing. I opened pit.htb:9090 and found login form, so I tried SQL injection, brute-forcing but nothing worked.
+
+![image](/images/blog/016/4.png)
+
+
+combining a hint HTB said in the announcement tweet &quot;Walk&quot; and the open snmp port, I decided to try snmp walking and it gave me lots of information
+
+</code></pre><p>snmpwalk -v 1 -c public 10.10.10.241 .1</p>
+<pre tabindex=0><code>first it gave me a name 
+![image](/images/blog/016/5.png)
+
+
+then it gave me a path 
+![image](/images/blog/016/6.png)
+
+
+I tried to browse this path from pit.com:9090 but it didn't work until I tried it into the new subdomain and it gave me a new login form.
+
+![image](/images/blog/016/7.png)
+
+I tried bruteforcing and found that the username and the password is michelle, also the running service is vulnerable to RCE via file upload but unfortunately I wasn't able to make a reverse connection.
+
+</code></pre><p><a href=https://www.exploit-db.com/exploits/47022>https://www.exploit-db.com/exploits/47022</a></p>
+<p><a href=https://secfolks.blogspot.com/2019/06/exploit-for-cve-2019-12744-remote.html>https://secfolks.blogspot.com/2019/06/exploit-for-cve-2019-12744-remote.html</a></p>
+<pre tabindex=0><code>
+
+
+So I decided to enumerate further via the RCE and found a file called /var/www/html/seeddms51x/conf/settings.xml which contains credentials, thanks to password reuse I used it to login into pit.htb:9090 with username michelle.
+
+![image](/images/blog/016/8.png)
+
+I found a terminal so I used it to make a reverse connection and get the user.txt flag
+
+![image](/images/blog/016/9.png)
+
+
+
+
+
+### Privilege Escalation
+
+I ran linpeas but it gave me nothing. so I returned to snmp output and found an interesting script called /usr/bin/monitor which executes any file with a wildcard check*sh in a directory called /usr/local/monitoring.
+
+&lt;image 10&gt; 
+
+unfortunately I didn’t have write access into /usr/bin/monitor, so I wrote a script in /usr/local/monitoring to make a reverse connection and reran snmpwalk to trigger it but it failed. so I created a new ssh keys and instead of making reverse connection, I let this script add the new public ssh key to root directory and triggered it via the same snmpwalk command.
+
+</code></pre><p>echo &ldquo;echo &lsquo;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCz+C7GLT+XBuejcaYnURSm4hTERqqINlwxGEKCaXInMFY82LhnrIYYm10c9SUQT4GfLIgzwH8s1mdIKI2L+Ir8Qr36jBYhEM87tS9zPuuxkm97FeiObR2apUQlTmvsksAK15XoiyBncNS+nBSccfvYqfMKOe6gvxM7df9ep5oQMS1OGr10FwYlotFLA2UDvjsGZuaVL1q3lkvRQIjvpUWEVVvTy+NHjRxk5vDPZ+luj7Z0l44emjV0Wcuf5t8VkVltY6IVcmkMdyMt39nQSGvZsBG2FMBQLl83B4AJ2pPkhSUzIdqfmvujzy4+IV+eLtTolvkjdwiQuwLMPFGjCfMkBDi6YpYjES/yE2DdU0QcPrR545JpxwdoGLAOV8NVgQKwH1jTUTZIytUI+ews9/gLRTd6aBxfAuIZybHQmun69nOtqG27HADdnK3beCsq89a7RfiX5E/kuS2POOLK3AH7ub8HfMrnvo6aq4T8YOlcl/NRqg36SS9AEAiX/baphFk= <a href=mailto:root@pit.htb>root@pit.htb</a>&rsquo; > /root/.ssh/authorized_keys " > check.sh</p>
+<pre tabindex=0><code>
+and I was able to login via SSH successfully as a root
+&lt;image of root&gt; 
+
+Thank you for reading!
+
+
+
+
+</code></pre>
 </article>
-</div>
-<div class=col-lg-6>
-<article class=site-blog-post>
-<div class=site-blog-post-thumb>
-<img src=https://iamnasef.com/images/blog/regular-image-vulnhub.png alt=post-thumb>
-</div>
-<div class=site-blog-post-content>
-<span>September 26, 2020</span>
-<h3><a href=https://iamnasef.com/blog/sputnik1/>Sputnik:1 Vulnhub Walkthrough</a></h3>
-<p>
-Sputnik:1 is a machine in which I used an enumration to get admin credintials from the history of github repo to obtain shell access and then exploited the misconfigured sudo permissions to get root Access. ...
-</p>
-<a href=https://iamnasef.com/blog/sputnik1/ class=read-more>read more</a>
-</div>
-</article>
-</div>
-<div class=col-lg-6>
-<article class=site-blog-post>
-<div class=site-blog-post-thumb>
-<img src=https://iamnasef.com/images/blog/regular-image-vulnhub.png alt=post-thumb>
-</div>
-<div class=site-blog-post-content>
-<span>September 25, 2020</span>
-<h3><a href=https://iamnasef.com/blog/dc2/>DC:2 Vulnhub Walkthrough</a></h3>
-<p>
-DC:2 is a machine in which I used an enumration to credintials and then exploited the misconfigured sudo permissions to get root Access.
-Scanning As always, I started scanning with Nmap ...
-</p>
-<a href=https://iamnasef.com/blog/dc2/ class=read-more>read more</a>
-</div>
-</article>
-</div>
-<div class=col-lg-6>
-<article class=site-blog-post>
-<div class=site-blog-post-thumb>
-<img src=https://iamnasef.com/images/blog/regular-image-vulnhub.png alt=post-thumb>
-</div>
-<div class=site-blog-post-content>
-<span>September 25, 2020</span>
-<h3><a href=https://iamnasef.com/blog/matrix/>Matrix:1 Vulnhub Walkthrough</a></h3>
-<p>
-Matrix:1 is a machine in which I used Enumeration to obtain shell access and then exploited the misconfigured sudo permissions to get root Access.
-Scanning As always, I started scanning with Nmap ...
-</p>
-<a href=https://iamnasef.com/blog/matrix/ class=read-more>read more</a>
-</div>
-</article>
-</div>
-<div class=col-lg-6>
-<article class=site-blog-post>
-<div class=site-blog-post-thumb>
-<img src=https://iamnasef.com/images/blog/008/regular-image.png alt=post-thumb>
-</div>
-<div class=site-blog-post-content>
-<span>September 25, 2020</span>
-<h3><a href=https://iamnasef.com/blog/tabby/>Tabby HackTheBox Walkthrough</a></h3>
-<p>
-Tabby is a machine in which I used Local File Inclusion to get tomcat credintials to obtain shell access and then used enumeration and lxd to get root Access. ...
-</p>
-<a href=https://iamnasef.com/blog/tabby/ class=read-more>read more</a>
-</div>
-</article>
-</div>
-<div class=col-lg-6>
-<article class=site-blog-post>
-<div class=site-blog-post-thumb>
-<img src=https://iamnasef.com/images/blog/regular-image-vulnhub.png alt=post-thumb>
-</div>
-<div class=site-blog-post-content>
-<span>September 24, 2020</span>
-<h3><a href=https://iamnasef.com/blog/ted/>Ted:1 Vulnhub Walkthrough</a></h3>
-<p>
-Ted:1 is a machine in which I used Local File Inclusion Vulnerability to obtain shell access and then exploited the misconfigured sudo permissions to get root Access. ...
-</p>
-<a href=https://iamnasef.com/blog/ted/ class=read-more>read more</a>
-</div>
-</article>
-</div>
-<div class=col-12>
-<div class=site-blog-pagination>
-<ul class="pagination pagination-default">
-<li class=page-item>
-<a href=/blog/ aria-label=First class=page-link role=button><span aria-hidden=true>&#171;&#171;</span></a>
-</li>
-<li class=page-item>
-<a href=/blog/ aria-label=Previous class=page-link role=button><span aria-hidden=true>&#171;</span></a>
-</li>
-<li class=page-item>
-<a href=/blog/ aria-label="Page 1" class=page-link role=button>1</a>
-</li>
-<li class="page-item active">
-<a href=# aria-current=page aria-label="Page 2" class=page-link role=button>2</a>
-</li>
-<li class="page-item disabled">
-<a href=# aria-disabled=true aria-label=Next class=page-link role=button tabindex=-1><span aria-hidden=true>&#187;</span></a>
-</li>
-<li class="page-item disabled">
-<a href=# aria-disabled=true aria-label=Last class=page-link role=button tabindex=-1><span aria-hidden=true>&#187;&#187;</span></a>
-</li>
-</ul>
-</div>
 </div>
 </div>
 </div>
