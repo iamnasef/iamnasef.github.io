@@ -64,74 +64,36 @@ I am Nasef and today I am going to show you how I hacked Pit machine from hack t
 <p><img src=/images/blog/016/1.png alt=image></p>
 <p>I ran another nmap scan -sU for enumerating udp services and found snmp open.</p>
 <p><img src=/images/blog/016/2.png alt=image></p>
-<pre tabindex=0><code> I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.
+<p>I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.</p>
+<p><img src=/images/blog/016/3.png alt=image></p>
+<p>This concludes the service enumeration phase.</p>
+<h3 id=exploiting-http-service>Exploiting HTTP Service</h3>
+<p>I opened pit.htb and ran gobuster but gave me nothing. I opened pit.htb:9090 and found login form, so I tried SQL injection, brute-forcing but nothing worked.</p>
+<p><img src=/images/blog/016/4.png alt=image></p>
+<p>combining a hint HTB said in the announcement tweet &ldquo;Walk&rdquo; and the open snmp port, I decided to try snmp walking and it gave me lots of information</p>
+<pre tabindex=0><code>snmpwalk -v 1 -c public 10.10.10.241 .1
+</code></pre><p>first it gave me a name
+<img src=/images/blog/016/5.png alt=image></p>
+<p>then it gave me a path
+<img src=/images/blog/016/6.png alt=image></p>
+<p>I tried to browse this path from pit.com:9090 but it didn&rsquo;t work until I tried it into the new subdomain and it gave me a new login form.</p>
+<p><img src=/images/blog/016/7.png alt=image></p>
+<p>I tried bruteforcing and found that the username and the password is michelle, also the running service is vulnerable to RCE via file upload but unfortunately I wasn&rsquo;t able to make a reverse connection.</p>
+<pre tabindex=0><code>https://www.exploit-db.com/exploits/47022
 
-![image](/images/blog/016/3.png)
-
-This concludes the service enumeration phase.
-
-
-
-### Exploiting HTTP Service
-
-I opened pit.htb and ran gobuster but gave me nothing. I opened pit.htb:9090 and found login form, so I tried SQL injection, brute-forcing but nothing worked.
-
-![image](/images/blog/016/4.png)
-
-
-combining a hint HTB said in the announcement tweet &quot;Walk&quot; and the open snmp port, I decided to try snmp walking and it gave me lots of information
-
-</code></pre><p>snmpwalk -v 1 -c public 10.10.10.241 .1</p>
-<pre tabindex=0><code>first it gave me a name 
-![image](/images/blog/016/5.png)
-
-
-then it gave me a path 
-![image](/images/blog/016/6.png)
-
-
-I tried to browse this path from pit.com:9090 but it didn't work until I tried it into the new subdomain and it gave me a new login form.
-
-![image](/images/blog/016/7.png)
-
-I tried bruteforcing and found that the username and the password is michelle, also the running service is vulnerable to RCE via file upload but unfortunately I wasn't able to make a reverse connection.
-
-</code></pre><p><a href=https://www.exploit-db.com/exploits/47022>https://www.exploit-db.com/exploits/47022</a></p>
-<p><a href=https://secfolks.blogspot.com/2019/06/exploit-for-cve-2019-12744-remote.html>https://secfolks.blogspot.com/2019/06/exploit-for-cve-2019-12744-remote.html</a></p>
-<pre tabindex=0><code>
-
-
-So I decided to enumerate further via the RCE and found a file called /var/www/html/seeddms51x/conf/settings.xml which contains credentials, thanks to password reuse I used it to login into pit.htb:9090 with username michelle.
-
-![image](/images/blog/016/8.png)
-
-I found a terminal so I used it to make a reverse connection and get the user.txt flag
-
-![image](/images/blog/016/9.png)
-
-
-
-
-
-### Privilege Escalation
-
-I ran linpeas but it gave me nothing. so I returned to snmp output and found an interesting script called /usr/bin/monitor which executes any file with a wildcard check*sh in a directory called /usr/local/monitoring.
-
-&lt;image 10&gt; 
-
-unfortunately I didn’t have write access into /usr/bin/monitor, so I wrote a script in /usr/local/monitoring to make a reverse connection and reran snmpwalk to trigger it but it failed. so I created a new ssh keys and instead of making reverse connection, I let this script add the new public ssh key to root directory and triggered it via the same snmpwalk command.
-
-</code></pre><p>echo &ldquo;echo &lsquo;ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCz+C7GLT+XBuejcaYnURSm4hTERqqINlwxGEKCaXInMFY82LhnrIYYm10c9SUQT4GfLIgzwH8s1mdIKI2L+Ir8Qr36jBYhEM87tS9zPuuxkm97FeiObR2apUQlTmvsksAK15XoiyBncNS+nBSccfvYqfMKOe6gvxM7df9ep5oQMS1OGr10FwYlotFLA2UDvjsGZuaVL1q3lkvRQIjvpUWEVVvTy+NHjRxk5vDPZ+luj7Z0l44emjV0Wcuf5t8VkVltY6IVcmkMdyMt39nQSGvZsBG2FMBQLl83B4AJ2pPkhSUzIdqfmvujzy4+IV+eLtTolvkjdwiQuwLMPFGjCfMkBDi6YpYjES/yE2DdU0QcPrR545JpxwdoGLAOV8NVgQKwH1jTUTZIytUI+ews9/gLRTd6aBxfAuIZybHQmun69nOtqG27HADdnK3beCsq89a7RfiX5E/kuS2POOLK3AH7ub8HfMrnvo6aq4T8YOlcl/NRqg36SS9AEAiX/baphFk= <a href=mailto:root@pit.htb>root@pit.htb</a>&rsquo; > /root/.ssh/authorized_keys " > check.sh</p>
-<pre tabindex=0><code>
-and I was able to login via SSH successfully as a root
-&lt;image of root&gt; 
-
-Thank you for reading!
-
-
-
-
-</code></pre>
+https://secfolks.blogspot.com/2019/06/exploit-for-cve-2019-12744-remote.html
+</code></pre><p>So I decided to enumerate further via the RCE and found a file called /var/www/html/seeddms51x/conf/settings.xml which contains credentials, thanks to password reuse I used it to login into pit.htb:9090 with username michelle.</p>
+<p><img src=/images/blog/016/8.png alt=image></p>
+<p>I found a terminal so I used it to make a reverse connection and get the user.txt flag</p>
+<p><img src=/images/blog/016/9.png alt=image></p>
+<h3 id=privilege-escalation>Privilege Escalation</h3>
+<p>I ran linpeas but it gave me nothing. so I returned to snmp output and found an interesting script called /usr/bin/monitor which executes any file with a wildcard check*sh in a directory called /usr/local/monitoring.</p>
+<p>&lt;image 10></p>
+<p>unfortunately I didn’t have write access into /usr/bin/monitor, so I wrote a script in /usr/local/monitoring to make a reverse connection and reran snmpwalk to trigger it but it failed. so I created a new ssh keys and instead of making reverse connection, I let this script add the new public ssh key to root directory and triggered it via the same snmpwalk command.</p>
+<pre tabindex=0><code>echo &quot;echo 'ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCz+C7GLT+XBuejcaYnURSm4hTERqqINlwxGEKCaXInMFY82LhnrIYYm10c9SUQT4GfLIgzwH8s1mdIKI2L+Ir8Qr36jBYhEM87tS9zPuuxkm97FeiObR2apUQlTmvsksAK15XoiyBncNS+nBSccfvYqfMKOe6gvxM7df9ep5oQMS1OGr10FwYlotFLA2UDvjsGZuaVL1q3lkvRQIjvpUWEVVvTy+NHjRxk5vDPZ+luj7Z0l44emjV0Wcuf5t8VkVltY6IVcmkMdyMt39nQSGvZsBG2FMBQLl83B4AJ2pPkhSUzIdqfmvujzy4+IV+eLtTolvkjdwiQuwLMPFGjCfMkBDi6YpYjES/yE2DdU0QcPrR545JpxwdoGLAOV8NVgQKwH1jTUTZIytUI+ews9/gLRTd6aBxfAuIZybHQmun69nOtqG27HADdnK3beCsq89a7RfiX5E/kuS2POOLK3AH7ub8HfMrnvo6aq4T8YOlcl/NRqg36SS9AEAiX/baphFk= root@pit.htb' &gt; /root/.ssh/authorized_keys &quot; &gt; check.sh
+</code></pre><p>and I was able to login via SSH successfully as a root
+</p>
+<p>Thank you for reading!</p>
 </article>
 </div>
 </div>
