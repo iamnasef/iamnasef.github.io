@@ -180,9 +180,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 Nmap done: 1 IP address (1 host up) scanned in 142.18 seconds
 
 
-</code></pre><p>I ran another nmap scan -sU for enumerating udp services and found two filtered ports, I may look into them.</p>
-<pre tabindex=0><code></code></pre><p>I ran another nmap scan -p- for enumerating the non-default ports but it gave me nothing new.</p>
-<pre tabindex=0><code></code></pre><p>This concludes the service enumeration phase.</p>
+</code></pre><p>I ran another both -sU for enumerating udp services and -p- for enumerating the non-default ports but it gave me nothing new, which concludes the service enumeration phase.</p>
 <h2 id=exploiting-ftp-service>Exploiting FTP Service</h2>
 <p>I tried to exploit FTP Service, and first thing came to my mind is trying to find if anonymous ftp login is allowed, but it wasn&rsquo;t.</p>
 <pre tabindex=0><code>ftp cap.htb     
